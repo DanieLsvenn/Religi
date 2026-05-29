@@ -562,6 +562,30 @@
         z-index: 50;
         image-rendering: pixelated;
       }
+      .leaderboard {
+        position: absolute;
+        top: 210px;
+        right: 14px;
+        width: 200px;
+        max-height: 360px;
+        overflow: auto;
+        background: rgba(8, 8, 12, 0.9);
+        border: 2px solid var(--border);
+        padding: 8px;
+        font-size: 9px;
+        z-index: 60;
+      }
+      .leaderboard h3 {
+        font-size: 10px;
+        color: var(--gold);
+        margin-bottom: 6px;
+      }
+      .leader-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 6px;
+        margin-bottom: 6px;
+      }
       #minimap-canvas.hidden {
         display: none;
       }
@@ -608,6 +632,205 @@
       ::-webkit-scrollbar-thumb {
         background: var(--border);
       }
+
+      /* ── Lobby Browser ── */
+      #lobby-browser-screen {
+        background: radial-gradient(
+          ellipse at 50% 20%,
+          #0a1a2e 0%,
+          #0a0a0f 70%
+        );
+        gap: 16px;
+      }
+      #lobby-browser-screen h2 {
+        font-size: 14px;
+        color: var(--gold);
+      }
+      .lobby-list {
+        width: 700px;
+        max-height: 340px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .lobby-entry {
+        background: var(--panel);
+        border: 2px solid var(--border);
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .lobby-entry:hover {
+        border-color: var(--teal);
+      }
+      .lobby-entry .le-name {
+        font-size: 9px;
+        color: var(--gold);
+      }
+      .lobby-entry .le-meta {
+        font-size: 7px;
+        color: var(--dim);
+        line-height: 2;
+      }
+      .lobby-entry .le-players {
+        font-size: 10px;
+        color: var(--teal);
+        text-align: right;
+      }
+      .lobby-entry .le-expires {
+        font-size: 6px;
+        color: var(--dim);
+        text-align: right;
+      }
+      .lobby-entry.full {
+        opacity: 0.5;
+        cursor: default;
+      }
+      .lobby-entry.started {
+        border-color: #334;
+      }
+      .lobby-empty {
+        font-size: 8px;
+        color: var(--dim);
+        text-align: center;
+        padding: 40px;
+      }
+      .lobby-browser-actions {
+        display: flex;
+        gap: 12px;
+      }
+
+      /* ── In-game Leaderboard panel ── */
+      #leaderboard-panel {
+        position: absolute;
+        top: 210px;
+        right: 14px;
+        width: 210px;
+        background: rgba(6, 6, 14, 0.93);
+        border: 2px solid var(--border);
+        padding: 8px;
+        font-size: 8px;
+        z-index: 60;
+        pointer-events: none;
+      }
+      #leaderboard-panel.hidden {
+        display: none;
+      }
+      #leaderboard-panel h3 {
+        font-size: 9px;
+        color: var(--gold);
+        margin-bottom: 6px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 4px;
+      }
+      .lb-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 2px;
+        border-bottom: 1px solid #1a1a28;
+        font-size: 7px;
+      }
+      .lb-row.lb-you {
+        color: var(--gold);
+      }
+      .lb-row.lb-dead {
+        opacity: 0.45;
+        text-decoration: line-through;
+      }
+      .lb-rank {
+        width: 16px;
+        color: var(--dim);
+      }
+      .lb-name {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .lb-score {
+        color: var(--teal);
+        text-align: right;
+      }
+
+      /* ── Spectator overlay ── */
+      #spectator-hud {
+        position: absolute;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.75);
+        border: 2px solid var(--red);
+        padding: 12px 24px;
+        font-size: 8px;
+        color: var(--red);
+        text-align: center;
+        z-index: 80;
+        pointer-events: none;
+        letter-spacing: 2px;
+      }
+      #spectator-hud.hidden {
+        display: none;
+      }
+      #spectator-hud .spec-sub {
+        font-size: 6px;
+        color: var(--dim);
+        margin-top: 6px;
+      }
+
+      /* ── Death modal (spectate / leave) ── */
+      #death-modal {
+        position: absolute;
+        inset: 0;
+        background: #000000cc;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 250;
+      }
+      #death-modal.hidden {
+        display: none;
+      }
+      #death-modal h2 {
+        font-size: 20px;
+        color: var(--red);
+        text-shadow: 0 0 20px var(--red);
+        margin-bottom: 10px;
+      }
+      #death-modal .death-stats {
+        font-size: 8px;
+        color: var(--text);
+        line-height: 2.4;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      #death-modal .death-stats span {
+        color: var(--gold);
+      }
+      .death-actions {
+        display: flex;
+        gap: 16px;
+      }
+
+      /* ── Score display in HUD ── */
+      #hud-score-display {
+        position: absolute;
+        bottom: 14px;
+        left: 14px;
+        font-size: 8px;
+        text-align: left;
+      }
+      #hud-score-display .score-val {
+        color: var(--gold);
+        font-size: 14px;
+      }
     </style>
   </head>
   <body>
@@ -625,7 +848,12 @@
         <span title="Islam">☽</span><span title="Hinduism">🕉</span
         ><span title="Shinto">⛩</span>
       </div>
-      <button class="btn" id="btn-play">► PLAY</button>
+      <div style="display: flex; gap: 12px">
+        <button class="btn" id="btn-play">► PLAY SOLO</button>
+        <button class="btn green-btn" id="btn-multiplayer">
+          ⚡ MULTIPLAYER
+        </button>
+      </div>
       <div
         style="
           margin-top: 14px;
@@ -637,6 +865,24 @@
       >
         SURVIVE 15 MINUTES · ANSWER TRIVIA TO UNLOCK ABILITIES<br />
         ALL RELIGIONS TREATED WITH RESPECT &amp; CURIOSITY
+      </div>
+    </div>
+
+    <!-- LOBBY BROWSER SCREEN -->
+    <div class="screen hidden" id="lobby-browser-screen">
+      <h2>⚡ SACRED ARENAS</h2>
+      <div style="font-size: 7px; color: var(--dim); margin-bottom: 12px">
+        Join an existing arena or create your own
+      </div>
+      <div class="lobby-list" id="lobby-list">
+        <div class="lobby-empty">Loading arenas...</div>
+      </div>
+      <div class="lobby-browser-actions" style="margin-top: 14px">
+        <button class="btn" id="btn-browser-back">◄ BACK</button>
+        <button class="btn" id="btn-refresh-lobbies">↻ REFRESH</button>
+        <button class="btn green-btn" id="btn-create-lobby">
+          + CREATE ARENA
+        </button>
       </div>
     </div>
 
@@ -710,6 +956,32 @@
         <div class="kills" id="hud-kills">0</div>
         <div style="font-size: 6px; color: var(--dim)">DEFEATED</div>
       </div>
+      <div id="hud-score-display">
+        <div style="font-size: 6px; color: var(--dim)">SCORE</div>
+        <div class="score-val" id="hud-score">0</div>
+      </div>
+    </div>
+
+    <!-- IN-GAME LEADERBOARD PANEL -->
+    <div id="leaderboard-panel" class="hidden">
+      <h3>★ LEADERBOARD</h3>
+      <div id="lb-rows"></div>
+    </div>
+
+    <!-- SPECTATOR HUD -->
+    <div id="spectator-hud" class="hidden">
+      ☠ SPECTATING
+      <div class="spec-sub">You have fallen — watching the battle unfold</div>
+    </div>
+
+    <!-- DEATH MODAL -->
+    <div id="death-modal" class="hidden">
+      <h2>✦ YOU HAVE FALLEN ✦</h2>
+      <div class="death-stats" id="death-stats"></div>
+      <div class="death-actions">
+        <button class="btn" id="btn-spectate">👁 SPECTATE</button>
+        <button class="btn danger" id="btn-leave-match">✕ LEAVE</button>
+      </div>
     </div>
 
     <!-- MINIMAP -->
@@ -745,6 +1017,7 @@
       <div class="end-stats" id="end-stats"></div>
       <div style="display: flex; gap: 16px; margin-top: 20px">
         <button class="btn" id="btn-play-again">► PLAY AGAIN</button>
+        <button class="btn" id="btn-back-to-menu">◄ MENU</button>
       </div>
     </div>
 
@@ -1415,6 +1688,7 @@
           spd: 1.6,
           dmg: 8,
           xp: 5,
+          points: 10,
           size: 18,
           paletteIdx: 0,
         },
@@ -1425,6 +1699,7 @@
           spd: 1.2,
           dmg: 15,
           xp: 10,
+          points: 20,
           size: 22,
           paletteIdx: 1,
         },
@@ -1435,6 +1710,7 @@
           spd: 0.6,
           dmg: 25,
           xp: 20,
+          points: 60,
           size: 28,
           paletteIdx: 2,
         },
@@ -1445,6 +1721,7 @@
           spd: 2.4,
           dmg: 10,
           xp: 8,
+          points: 12,
           size: 16,
           paletteIdx: 3,
         },
@@ -1455,6 +1732,7 @@
           spd: 1.0,
           dmg: 30,
           xp: 25,
+          points: 80,
           size: 26,
           paletteIdx: 4,
         },
@@ -1465,6 +1743,7 @@
           spd: 1.4,
           dmg: 20,
           xp: 15,
+          points: 30,
           size: 20,
           paletteIdx: 5,
         },
@@ -1776,7 +2055,7 @@
       // ═══════════════════════════════════════════════════════════════════════
 
       let arenaTileCanvas = null; // Pre-rendered floor tile (1024×1024)
-      const ARENA_PX = 1040; // Floor canvas size in world-pixels
+      const ARENA_PX = 2080; // Floor canvas size in world-pixels (doubled for 20-player arena)
       const TILE_SIZE = 40; // Each stone slab in pixels
 
       /**
@@ -1835,11 +2114,15 @@
         }
 
         // Sacred rune circles at fixed positions (adds atmosphere)
-        drawRuneCircle(ctx, ARENA_PX * 0.5, ARENA_PX * 0.5, 180, "#1a1a40");
-        drawRuneCircle(ctx, ARENA_PX * 0.25, ARENA_PX * 0.25, 80, "#1a1830");
-        drawRuneCircle(ctx, ARENA_PX * 0.75, ARENA_PX * 0.75, 80, "#1a1830");
-        drawRuneCircle(ctx, ARENA_PX * 0.75, ARENA_PX * 0.25, 80, "#1a1830");
-        drawRuneCircle(ctx, ARENA_PX * 0.25, ARENA_PX * 0.75, 80, "#1a1830");
+        drawRuneCircle(ctx, ARENA_PX * 0.5, ARENA_PX * 0.5, 280, "#1a1a40");
+        drawRuneCircle(ctx, ARENA_PX * 0.25, ARENA_PX * 0.25, 140, "#1a1830");
+        drawRuneCircle(ctx, ARENA_PX * 0.75, ARENA_PX * 0.75, 140, "#1a1830");
+        drawRuneCircle(ctx, ARENA_PX * 0.75, ARENA_PX * 0.25, 140, "#1a1830");
+        drawRuneCircle(ctx, ARENA_PX * 0.25, ARENA_PX * 0.75, 140, "#1a1830");
+        drawRuneCircle(ctx, ARENA_PX * 0.5, ARENA_PX * 0.15, 80, "#1a1825");
+        drawRuneCircle(ctx, ARENA_PX * 0.5, ARENA_PX * 0.85, 80, "#1a1825");
+        drawRuneCircle(ctx, ARENA_PX * 0.15, ARENA_PX * 0.5, 80, "#1a1825");
+        drawRuneCircle(ctx, ARENA_PX * 0.85, ARENA_PX * 0.5, 80, "#1a1825");
 
         // Border wall decoration strip
         ctx.fillStyle = "#151525";
@@ -1931,6 +2214,7 @@
       // World scale: how many screen pixels = 1 world unit
       // Enemy positions are stored as world units ([-13..13] range from original code)
       const WORLD_SCALE = 38;
+      const WORLD_BOUNDS = 26; // enlarged arena to fit 20 players
 
       // Convert world coordinate to screen coordinate
       function worldToScreen(wx, wy) {
@@ -1975,6 +2259,13 @@
         time: 0, // total elapsed seconds for animation timers
         levelUpQueue: [],
         levelUpActive: false,
+        score: 0,
+        leaderboard: [],
+        graves: [],
+        spectating: false, // true when player has died and chosen to spectate
+        playerName: "", // set from name prompt
+        spectatorTarget: null, // world coords to follow when spectating
+        currentLobbyId: null, // active lobby id for rejoining
       };
 
       let lastTimestamp = 0;
@@ -1983,7 +2274,7 @@
       //  PLAYER & ENTITY CREATION
       // ═══════════════════════════════════════════════════════════════════════
 
-      function createPlayer(clsId) {
+      function createPlayer(clsId, name) {
         const cls = CLASSES.find((c) => c.id === clsId);
         return {
           cls,
@@ -2012,6 +2303,8 @@
           orbitAngle: 0,
           bobPhase: 0, // animation bobbing phase
           hitFlash: 0, // flash timer when hit
+          score: 0,
+          name: name || "",
         };
       }
 
@@ -2054,8 +2347,40 @@
       }
 
       function spawnEnemy(wave) {
+        // Pick a random edge angle, spawn beyond visible range
         const angle = Math.random() * Math.PI * 2;
-        const dist = 12 + Math.random() * 4;
+        const dist = 14 + Math.random() * 6;
+
+        let ex = Math.cos(angle) * dist;
+        let ey = Math.sin(angle) * dist;
+
+        // Safe-radius: don't spawn within 5 world units of any player
+        const SAFE_RADIUS_SQ = 25; // 5^2
+        const allPlayers = [
+          GS.player,
+          ...GS.botPlayers,
+          ...Object.values(netPlayers || {}),
+        ].filter(Boolean);
+        let tries = 0;
+        while (tries < 12) {
+          let tooClose = false;
+          for (const p of allPlayers) {
+            if (!p || p.dead) continue;
+            const px = p.x || 0,
+              py = p.y || 0;
+            if ((ex - px) ** 2 + (ey - py) ** 2 < SAFE_RADIUS_SQ) {
+              tooClose = true;
+              break;
+            }
+          }
+          if (!tooClose) break;
+          const a2 = Math.random() * Math.PI * 2;
+          const d2 = 14 + Math.random() * 6;
+          ex = Math.cos(a2) * d2;
+          ey = Math.sin(a2) * d2;
+          tries++;
+        }
+
         const typeIdx = Math.floor(
           Math.random() *
             Math.min(2 + Math.floor(wave / 2), ENEMY_TYPES.length),
@@ -2066,17 +2391,17 @@
           type,
           hp,
           maxHp: hp,
-          x: Math.cos(angle) * dist,
-          y: Math.sin(angle) * dist,
+          x: ex,
+          y: ey,
           speed: type.spd * (1 + (wave - 1) * 0.08),
           dmg: type.dmg * (1 + (wave - 1) * 0.15),
           xp: type.xp,
           alive: true,
-          hitFlash: 0, // white flash timer when damaged
+          hitFlash: 0,
           size: type.size,
           bobPhase: Math.random() * Math.PI * 2,
-          wobbleAmt: 0, // increases when hit
-          deathTimer: -1, // counts down death animation
+          wobbleAmt: 0,
+          deathTimer: -1,
         };
       }
 
@@ -2805,6 +3130,7 @@
           renderAbilityVFX();
           renderBots();
           renderRemotePlayers();
+          renderGraves();
           renderEnemies();
           renderXpOrbs();
           renderParticles();
@@ -2817,6 +3143,22 @@
         }
 
         requestAnimationFrame(gameLoop);
+      }
+
+      function renderGraves() {
+        for (const g of GS.graves) {
+          const [sx, sy] = worldToScreen(g.x, g.y);
+          ctx2d.save();
+          ctx2d.fillStyle = "#222";
+          ctx2d.fillRect(sx - 8, sy - 18, 16, 18);
+          ctx2d.fillStyle = "#666";
+          ctx2d.fillRect(sx - 6, sy - 16, 12, 14);
+          ctx2d.fillStyle = "#ffffff";
+          ctx2d.font = '7px "Press Start 2P"';
+          ctx2d.textAlign = "center";
+          ctx2d.fillText((g.name || "").substring(0, 6), sx, sy - 4);
+          ctx2d.restore();
+        }
       }
 
       function updateWaveEffects(dt) {
@@ -2849,11 +3191,13 @@
         if (!p || p.dead) return;
 
         // Movement from keyboard input
-        const input = getInput();
+        let input = getInput();
+        // Level-up modal is shown but game continues running (multiplayer-friendly)
+        // Player can still move; only ability triggers blocked via modal UI
         const spd = p.speed * dt;
         let nx = p.x + input.dx * spd;
         let ny = p.y + input.dy * spd;
-        const bound = 13;
+        const bound = WORLD_BOUNDS;
         nx = Math.max(-bound, Math.min(bound, nx));
         ny = Math.max(-bound, Math.min(bound, ny));
         p.x = nx;
@@ -2910,6 +3254,28 @@
         if (player.hp <= 0) {
           player.hp = 0;
           player.dead = true;
+          // Create a grave marker for this player
+          try {
+            GS.graves.push({
+              x: player.x,
+              y: player.y,
+              name: player.name || "",
+              wave: GS.wave,
+              score: player.score || 0,
+            });
+          } catch (e) {}
+          // Notify server about death for leaderboard and spectator
+          try {
+            if (typeof socket !== "undefined" && socket && socket.connected) {
+              socket.emit("playerDead", {
+                x: player.x,
+                y: player.y,
+                name: player.name || "",
+                wave: GS.wave,
+                score: player.score || 0,
+              });
+            }
+          } catch (e) {}
           checkMatchOver();
         }
       }
@@ -2923,8 +3289,14 @@
             bot.botTimer = 0.5 + Math.random() * 0.5;
             const angle = Math.random() * Math.PI * 2;
             const spd = bot.cls.speed * 0.4;
-            bot.x = Math.max(-13, Math.min(13, bot.x + Math.cos(angle) * spd));
-            bot.y = Math.max(-13, Math.min(13, bot.y + Math.sin(angle) * spd));
+            bot.x = Math.max(
+              -WORLD_BOUNDS,
+              Math.min(WORLD_BOUNDS, bot.x + Math.cos(angle) * spd),
+            );
+            bot.y = Math.max(
+              -WORLD_BOUNDS,
+              Math.min(WORLD_BOUNDS, bot.y + Math.sin(angle) * spd),
+            );
           }
           for (const e of GS.enemies) {
             if (!e.alive) continue;
@@ -3083,6 +3455,20 @@
             "+" + enemy.type.xp + " XP",
             "#4488ff",
           );
+          // Award points for leaderboard and notify server
+          const pts = enemy.type.points || enemy.type.xp * 10 || 10;
+          if (GS.player) {
+            GS.player.score = (GS.player.score || 0) + pts;
+            try {
+              if (typeof socket !== "undefined" && socket && socket.connected) {
+                socket.emit("enemyKilled", {
+                  points: pts,
+                  enemyId: enemy.type.id,
+                  wave: GS.wave,
+                });
+              }
+            } catch (e) {}
+          }
         }
       }
 
@@ -3118,6 +3504,7 @@
       ) {
         // optional `sourceAbility` may be passed as 9th argument to tag which ability created this projectile
         const sourceAbility = arguments.length >= 9 ? arguments[8] : null;
+        const ownerId = arguments.length >= 10 ? arguments[9] : null;
         GS.projectiles.push({
           x,
           y,
@@ -3126,6 +3513,7 @@
           damage,
           color,
           owner,
+          ownerId: ownerId,
           type,
           sourceAbility,
           life: 3,
@@ -3523,23 +3911,38 @@
 
       function spawnSystem(dt) {
         GS.lastSpawnTime += dt;
-        const interval = Math.max(0.5, 3 - GS.wave * 0.2);
+        // Scale spawn rate and count with number of active players
+        const activePlayers = Math.max(
+          1,
+          GS.botPlayers.filter((b) => !b.dead).length +
+            (GS.player && !GS.player.dead ? 1 : 0) +
+            Object.values(netPlayers || {}).filter((p) => !p.dead).length,
+        );
+        const playerScale = Math.sqrt(activePlayers); // soft scaling
+        const interval = Math.max(0.4, (3 - GS.wave * 0.2) / playerScale);
         if (GS.lastSpawnTime >= interval) {
           GS.lastSpawnTime = 0;
-          const count = Math.min(3 + GS.wave, 8);
+          const count = Math.min(Math.ceil((3 + GS.wave) * playerScale), 20);
           const aliveCount = GS.enemies.filter((e) => e.alive).length;
+          const maxEnemies = Math.min(500, 150 * activePlayers);
           for (let i = 0; i < count; i++) {
-            if (aliveCount < 500) GS.enemies.push(spawnEnemy(GS.wave));
+            if (aliveCount + i < maxEnemies)
+              GS.enemies.push(spawnEnemy(GS.wave));
           }
         }
         // Cull dead enemies that have finished death animation
-        if (GS.enemies.length > 800) {
+        if (GS.enemies.length > 1000) {
           GS.enemies = GS.enemies.filter((e) => e.alive || e.deathTimer > 0);
         }
       }
 
       function spawnWave(wave) {
-        const base = 8 + wave * 4;
+        const activePlayers = Math.max(
+          1,
+          GS.botPlayers.filter((b) => !b.dead).length +
+            (GS.player && !GS.player.dead ? 1 : 0),
+        );
+        const base = Math.ceil((8 + wave * 4) * Math.sqrt(activePlayers));
         for (let i = 0; i < base; i++) {
           if (GS.enemies.filter((e) => e.alive).length < 500)
             GS.enemies.push(spawnEnemy(wave));
@@ -3733,7 +4136,6 @@
       }
 
       function showLevelUpModal(player, mode = "ability") {
-        GS.paused = true;
         GS.levelUpActive = true;
         GS.levelUpChoiceMade = false;
         const modal = document.getElementById("levelup-modal");
@@ -3929,7 +4331,6 @@
 
       function closeLevelUpModal() {
         document.getElementById("levelup-modal").classList.add("hidden");
-        GS.paused = false;
         GS.levelUpActive = false;
         // Continue processing any queued level-ups after the modal closes
         setTimeout(processLevelUpQueue, 120);
@@ -4151,7 +4552,25 @@
             "Player" + Math.floor(Math.random() * 1000),
           ) || "Player" + Math.floor(Math.random() * 1000);
         const cls = GS.selectedClass || "priest";
-        socket = io();
+        // Prefer explicit multiplayer server URL (override with ?server=...)
+        (function () {
+          const urlParams = new URLSearchParams(location.search);
+          const serverOverride = urlParams.get("server");
+          let serverUrl = serverOverride || "";
+          // If not overridden and not on localhost, use configured production server.
+          if (!serverUrl) {
+            if (
+              location.hostname !== "localhost" &&
+              location.hostname !== "127.0.0.1"
+            ) {
+              // TODO: replace with your deployed multiplayer server domain (e.g. https://your-server.onrender.com)
+              serverUrl = "https://YOUR_SERVER_DOMAIN";
+            }
+          }
+          socket = serverUrl
+            ? io(serverUrl, { transports: ["websocket", "polling"] })
+            : io();
+        })();
 
         socket.on("connect", () => {
           socket.emit("join", { name, cls });
@@ -4222,7 +4641,30 @@
               "remote",
               proj.type,
               proj.sourceAbility,
+              proj.ownerId || null,
             );
+          } catch (e) {}
+        });
+
+        // Session leaderboard update
+        socket.on("leaderboard", (lb) => {
+          try {
+            GS.leaderboard = lb || [];
+          } catch (e) {}
+        });
+
+        // Player died elsewhere — add grave marker and update leaderboard
+        socket.on("playerDied", (payload) => {
+          try {
+            if (!payload) return;
+            GS.graves.push({
+              x: payload.x || 0,
+              y: payload.y || 0,
+              name: payload.name || "",
+              wave: payload.wave || 0,
+              score: payload.score || 0,
+            });
+            if (payload.leaderboard) GS.leaderboard = payload.leaderboard;
           } catch (e) {}
         });
 
