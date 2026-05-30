@@ -632,6 +632,205 @@
       ::-webkit-scrollbar-thumb {
         background: var(--border);
       }
+
+      /* ── Lobby Browser ── */
+      #lobby-browser-screen {
+        background: radial-gradient(
+          ellipse at 50% 20%,
+          #0a1a2e 0%,
+          #0a0a0f 70%
+        );
+        gap: 16px;
+      }
+      #lobby-browser-screen h2 {
+        font-size: 14px;
+        color: var(--gold);
+      }
+      .lobby-list {
+        width: 700px;
+        max-height: 340px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .lobby-entry {
+        background: var(--panel);
+        border: 2px solid var(--border);
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .lobby-entry:hover {
+        border-color: var(--teal);
+      }
+      .lobby-entry .le-name {
+        font-size: 9px;
+        color: var(--gold);
+      }
+      .lobby-entry .le-meta {
+        font-size: 7px;
+        color: var(--dim);
+        line-height: 2;
+      }
+      .lobby-entry .le-players {
+        font-size: 10px;
+        color: var(--teal);
+        text-align: right;
+      }
+      .lobby-entry .le-expires {
+        font-size: 6px;
+        color: var(--dim);
+        text-align: right;
+      }
+      .lobby-entry.full {
+        opacity: 0.5;
+        cursor: default;
+      }
+      .lobby-entry.started {
+        border-color: #334;
+      }
+      .lobby-empty {
+        font-size: 8px;
+        color: var(--dim);
+        text-align: center;
+        padding: 40px;
+      }
+      .lobby-browser-actions {
+        display: flex;
+        gap: 12px;
+      }
+
+      /* ── In-game Leaderboard panel ── */
+      #leaderboard-panel {
+        position: absolute;
+        top: 210px;
+        right: 14px;
+        width: 210px;
+        background: rgba(6, 6, 14, 0.93);
+        border: 2px solid var(--border);
+        padding: 8px;
+        font-size: 8px;
+        z-index: 60;
+        pointer-events: none;
+      }
+      #leaderboard-panel.hidden {
+        display: none;
+      }
+      #leaderboard-panel h3 {
+        font-size: 9px;
+        color: var(--gold);
+        margin-bottom: 6px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 4px;
+      }
+      .lb-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 2px;
+        border-bottom: 1px solid #1a1a28;
+        font-size: 7px;
+      }
+      .lb-row.lb-you {
+        color: var(--gold);
+      }
+      .lb-row.lb-dead {
+        opacity: 0.45;
+        text-decoration: line-through;
+      }
+      .lb-rank {
+        width: 16px;
+        color: var(--dim);
+      }
+      .lb-name {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .lb-score {
+        color: var(--teal);
+        text-align: right;
+      }
+
+      /* ── Spectator overlay ── */
+      #spectator-hud {
+        position: absolute;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.75);
+        border: 2px solid var(--red);
+        padding: 12px 24px;
+        font-size: 8px;
+        color: var(--red);
+        text-align: center;
+        z-index: 80;
+        pointer-events: none;
+        letter-spacing: 2px;
+      }
+      #spectator-hud.hidden {
+        display: none;
+      }
+      #spectator-hud .spec-sub {
+        font-size: 6px;
+        color: var(--dim);
+        margin-top: 6px;
+      }
+
+      /* ── Death modal (spectate / leave) ── */
+      #death-modal {
+        position: absolute;
+        inset: 0;
+        background: #000000cc;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 250;
+      }
+      #death-modal.hidden {
+        display: none;
+      }
+      #death-modal h2 {
+        font-size: 20px;
+        color: var(--red);
+        text-shadow: 0 0 20px var(--red);
+        margin-bottom: 10px;
+      }
+      #death-modal .death-stats {
+        font-size: 8px;
+        color: var(--text);
+        line-height: 2.4;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      #death-modal .death-stats span {
+        color: var(--gold);
+      }
+      .death-actions {
+        display: flex;
+        gap: 16px;
+      }
+
+      /* ── Score display in HUD ── */
+      #hud-score-display {
+        position: absolute;
+        bottom: 14px;
+        left: 14px;
+        font-size: 8px;
+        text-align: left;
+      }
+      #hud-score-display .score-val {
+        color: var(--gold);
+        font-size: 14px;
+      }
     </style>
   </head>
   <body>
@@ -649,7 +848,12 @@
         <span title="Islam">☽</span><span title="Hinduism">🕉</span
         ><span title="Shinto">⛩</span>
       </div>
-      <button class="btn" id="btn-play">► PLAY</button>
+      <div style="display: flex; gap: 12px">
+        <button class="btn" id="btn-play">► PLAY SOLO</button>
+        <button class="btn green-btn" id="btn-multiplayer">
+          ⚡ MULTIPLAYER
+        </button>
+      </div>
       <div
         style="
           margin-top: 14px;
@@ -661,6 +865,24 @@
       >
         SURVIVE 15 MINUTES · ANSWER TRIVIA TO UNLOCK ABILITIES<br />
         ALL RELIGIONS TREATED WITH RESPECT &amp; CURIOSITY
+      </div>
+    </div>
+
+    <!-- LOBBY BROWSER SCREEN -->
+    <div class="screen hidden" id="lobby-browser-screen">
+      <h2>⚡ SACRED ARENAS</h2>
+      <div style="font-size: 7px; color: var(--dim); margin-bottom: 12px">
+        Join an existing arena or create your own
+      </div>
+      <div class="lobby-list" id="lobby-list">
+        <div class="lobby-empty">Loading arenas...</div>
+      </div>
+      <div class="lobby-browser-actions" style="margin-top: 14px">
+        <button class="btn" id="btn-browser-back">◄ BACK</button>
+        <button class="btn" id="btn-refresh-lobbies">↻ REFRESH</button>
+        <button class="btn green-btn" id="btn-create-lobby">
+          + CREATE ARENA
+        </button>
       </div>
     </div>
 
@@ -734,6 +956,32 @@
         <div class="kills" id="hud-kills">0</div>
         <div style="font-size: 6px; color: var(--dim)">DEFEATED</div>
       </div>
+      <div id="hud-score-display">
+        <div style="font-size: 6px; color: var(--dim)">SCORE</div>
+        <div class="score-val" id="hud-score">0</div>
+      </div>
+    </div>
+
+    <!-- IN-GAME LEADERBOARD PANEL -->
+    <div id="leaderboard-panel" class="hidden">
+      <h3>★ LEADERBOARD</h3>
+      <div id="lb-rows"></div>
+    </div>
+
+    <!-- SPECTATOR HUD -->
+    <div id="spectator-hud" class="hidden">
+      ☠ SPECTATING
+      <div class="spec-sub">You have fallen — watching the battle unfold</div>
+    </div>
+
+    <!-- DEATH MODAL -->
+    <div id="death-modal" class="hidden">
+      <h2>✦ YOU HAVE FALLEN ✦</h2>
+      <div class="death-stats" id="death-stats"></div>
+      <div class="death-actions">
+        <button class="btn" id="btn-spectate">👁 SPECTATE</button>
+        <button class="btn danger" id="btn-leave-match">✕ LEAVE</button>
+      </div>
     </div>
 
     <!-- MINIMAP -->
@@ -769,6 +1017,7 @@
       <div class="end-stats" id="end-stats"></div>
       <div style="display: flex; gap: 16px; margin-top: 20px">
         <button class="btn" id="btn-play-again">► PLAY AGAIN</button>
+        <button class="btn" id="btn-back-to-menu">◄ MENU</button>
       </div>
     </div>
 
@@ -1508,6 +1757,41 @@
 
       const SpriteCache = {};
 
+      const IMAGE_SPRITE_PATHS = {
+        priest: "Assets/Priest.png",
+        monk: "Assets/Monk.png",
+        dervish: "Assets/Dervish.png",
+        yogi: "Assets/Yogi.png",
+        shrine_maiden: "Assets/Maiden.png",
+        shadow: "Assets/Shadow.png",
+        wraith: "Assets/Wraith.png",
+        golem: "Assets/Golem.png",
+        specter: "Assets/Specter.png",
+        demon: "Assets/Demon.png",
+        revenant: "Assets/Revenant.png",
+      };
+
+      function loadSpriteImage(id, src) {
+        const img = new Image();
+        SpriteCache[id] = img;
+        img.onload = () => {
+          SpriteCache[id] = img;
+        };
+        img.onerror = () => {
+          console.warn(`Failed to load sprite image: ${src}`);
+          const entityId = id.replace(/^(player_|enemy_)/, "");
+          if (CLASS_PIXELS[entityId]) {
+            SpriteCache[id] = buildSprite(id, CLASS_PIXELS[entityId], 40);
+          } else if (ENEMY_PIXELS[entityId]) {
+            const enemyType = ENEMY_TYPES.find((et) => et.id === entityId);
+            const scale = enemyType ? enemyType.size * 2 : 40;
+            SpriteCache[id] = buildSprite(id, ENEMY_PIXELS[entityId], scale);
+          }
+        };
+        img.src = src;
+        return img;
+      }
+
       /**
        * drawPixelArt(canvas, pixels, palette)
        * pixels: array of 16 rows, each row a string of hex chars (0=transparent, 1..F = palette index)
@@ -1792,10 +2076,20 @@
       // Pre-build all sprites at match start
       function initSprites() {
         for (const cls of CLASSES) {
-          buildSprite("player_" + cls.id, CLASS_PIXELS[cls.id], 40);
+          const imageSrc = IMAGE_SPRITE_PATHS[cls.id];
+          if (imageSrc) {
+            loadSpriteImage("player_" + cls.id, imageSrc);
+          } else {
+            buildSprite("player_" + cls.id, CLASS_PIXELS[cls.id], 40);
+          }
         }
         for (const et of ENEMY_TYPES) {
-          buildSprite("enemy_" + et.id, ENEMY_PIXELS[et.id], et.size * 2);
+          const imageSrc = IMAGE_SPRITE_PATHS[et.id];
+          if (imageSrc) {
+            loadSpriteImage("enemy_" + et.id, imageSrc);
+          } else {
+            buildSprite("enemy_" + et.id, ENEMY_PIXELS[et.id], et.size * 2);
+          }
         }
       }
 
@@ -1805,89 +2099,164 @@
       //  Features: stone slabs, cracks, moss patches, glyph rune circles.
       // ═══════════════════════════════════════════════════════════════════════
 
-      let arenaTileCanvas = null; // Pre-rendered floor tile (1024×1024)
-      const ARENA_PX = 2080; // Floor canvas size in world-pixels (doubled for 20-player arena)
-      const TILE_SIZE = 40; // Each stone slab in pixels
+      let arenaTileCanvas = null; // Pre-rendered map canvas
+      const ARENA_WIDTH = 6792; // Map image width in pixels
+      const ARENA_HEIGHT = 3704; // Map image height in pixels
+      const TILE_SIZE = 40; // Used only for fallback procedural tile generation
+
+      const mapBackgroundImage = new Image();
+      mapBackgroundImage.src = "Assets/Map.png";
+      mapBackgroundImage.onload = () => {
+        generateArenaFloor();
+      };
+      mapBackgroundImage.onerror = () => {
+        console.warn("Failed to load map background image Assets/Map.png");
+      };
 
       /**
        * generateArenaFloor()
-       * Draws stone tile patterns, cracks, and decorations once into a static canvas.
+       * Draws the map image onto a world canvas if available, otherwise falls back to the old stone floor.
        * Returns the canvas so it can be blitted cheaply every frame.
        */
       function generateArenaFloor() {
         const c = document.createElement("canvas");
-        c.width = ARENA_PX;
-        c.height = ARENA_PX;
+        c.width = ARENA_WIDTH;
+        c.height = ARENA_HEIGHT;
         const ctx = c.getContext("2d");
-        const cols = Math.ceil(ARENA_PX / TILE_SIZE);
 
-        // Base dark stone fill
-        ctx.fillStyle = "#090910";
-        ctx.fillRect(0, 0, ARENA_PX, ARENA_PX);
+        if (
+          mapBackgroundImage.complete &&
+          mapBackgroundImage.naturalWidth > 0
+        ) {
+          ctx.drawImage(mapBackgroundImage, 0, 0, ARENA_WIDTH, ARENA_HEIGHT);
+        } else {
+          const cols = Math.ceil(ARENA_WIDTH / TILE_SIZE);
+          const rows = Math.ceil(ARENA_HEIGHT / TILE_SIZE);
 
-        // Stone slab grid
-        for (let row = 0; row < cols; row++) {
-          for (let col = 0; col < cols; col++) {
-            const x = col * TILE_SIZE;
-            const y = row * TILE_SIZE;
-            const checker = (row + col) % 2;
-            // Slight color variation per tile for natural look
-            const base = checker ? 14 : 11;
-            const v = base + Math.floor(seededRand(row * 97 + col * 13) * 5);
-            ctx.fillStyle = `rgb(${v},${v},${v + 4})`;
-            ctx.fillRect(x + 1, y + 1, TILE_SIZE - 2, TILE_SIZE - 2);
+          // Base dark stone fill
+          ctx.fillStyle = "#090910";
+          ctx.fillRect(0, 0, ARENA_WIDTH, ARENA_HEIGHT);
 
-            // Tile edge grout lines
-            ctx.strokeStyle = "#0a0a14";
-            ctx.lineWidth = 1;
-            ctx.strokeRect(x + 0.5, y + 0.5, TILE_SIZE - 1, TILE_SIZE - 1);
+          // Stone slab grid
+          for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < cols; col++) {
+              const x = col * TILE_SIZE;
+              const y = row * TILE_SIZE;
+              const checker = (row + col) % 2;
+              // Slight color variation per tile for natural look
+              const base = checker ? 14 : 11;
+              const v = base + Math.floor(seededRand(row * 97 + col * 13) * 5);
+              ctx.fillStyle = `rgb(${v},${v},${v + 4})`;
+              ctx.fillRect(x + 1, y + 1, TILE_SIZE - 2, TILE_SIZE - 2);
 
-            // Random cracks on ~20% of tiles
-            if (seededRand(row * 31 + col * 7) < 0.2) {
-              drawCrack(ctx, x + 2, y + 2, TILE_SIZE - 4, row * 31 + col * 7);
-            }
+              // Tile edge grout lines
+              ctx.strokeStyle = "#0a0a14";
+              ctx.lineWidth = 1;
+              ctx.strokeRect(x + 0.5, y + 0.5, TILE_SIZE - 1, TILE_SIZE - 1);
 
-            // Moss/age spots on ~15% of tiles
-            if (seededRand(row * 53 + col * 11) < 0.15) {
-              const ms = 2 + Math.floor(seededRand(row * 71 + col) * 5);
-              const mx =
-                x + 4 + Math.floor(seededRand(row + col * 3) * (TILE_SIZE - 8));
-              const my =
-                y +
-                4 +
-                Math.floor(seededRand(row * 2 + col * 5) * (TILE_SIZE - 8));
-              ctx.fillStyle = `rgba(20,55,20,${0.3 + seededRand(row * col + 1) * 0.3})`;
-              ctx.beginPath();
-              ctx.ellipse(mx, my, ms, ms * 0.7, 0, 0, Math.PI * 2);
-              ctx.fill();
+              // Random cracks on ~20% of tiles
+              if (seededRand(row * 31 + col * 7) < 0.2) {
+                drawCrack(ctx, x + 2, y + 2, TILE_SIZE - 4, row * 31 + col * 7);
+              }
+
+              // Moss/age spots on ~15% of tiles
+              if (seededRand(row * 53 + col * 11) < 0.15) {
+                const ms = 2 + Math.floor(seededRand(row * 71 + col) * 5);
+                const mx =
+                  x +
+                  4 +
+                  Math.floor(seededRand(row + col * 3) * (TILE_SIZE - 8));
+                const my =
+                  y +
+                  4 +
+                  Math.floor(seededRand(row * 2 + col * 5) * (TILE_SIZE - 8));
+                ctx.fillStyle = `rgba(20,55,20,${0.3 + seededRand(row * col + 1) * 0.3})`;
+                ctx.beginPath();
+                ctx.ellipse(mx, my, ms, ms * 0.7, 0, 0, Math.PI * 2);
+                ctx.fill();
+              }
             }
           }
+
+          // Sacred rune circles at fixed positions (adds atmosphere)
+          drawRuneCircle(
+            ctx,
+            ARENA_WIDTH * 0.5,
+            ARENA_HEIGHT * 0.5,
+            280,
+            "#1a1a40",
+          );
+          drawRuneCircle(
+            ctx,
+            ARENA_WIDTH * 0.25,
+            ARENA_HEIGHT * 0.25,
+            140,
+            "#1a1830",
+          );
+          drawRuneCircle(
+            ctx,
+            ARENA_WIDTH * 0.75,
+            ARENA_HEIGHT * 0.75,
+            140,
+            "#1a1830",
+          );
+          drawRuneCircle(
+            ctx,
+            ARENA_WIDTH * 0.75,
+            ARENA_HEIGHT * 0.25,
+            140,
+            "#1a1830",
+          );
+          drawRuneCircle(
+            ctx,
+            ARENA_WIDTH * 0.25,
+            ARENA_HEIGHT * 0.75,
+            140,
+            "#1a1830",
+          );
+          drawRuneCircle(
+            ctx,
+            ARENA_WIDTH * 0.5,
+            ARENA_HEIGHT * 0.15,
+            80,
+            "#1a1825",
+          );
+          drawRuneCircle(
+            ctx,
+            ARENA_WIDTH * 0.5,
+            ARENA_HEIGHT * 0.85,
+            80,
+            "#1a1825",
+          );
+          drawRuneCircle(
+            ctx,
+            ARENA_WIDTH * 0.15,
+            ARENA_HEIGHT * 0.5,
+            80,
+            "#1a1825",
+          );
+          drawRuneCircle(
+            ctx,
+            ARENA_WIDTH * 0.85,
+            ARENA_HEIGHT * 0.5,
+            80,
+            "#1a1825",
+          );
+
+          // Border wall decoration strip
+          ctx.fillStyle = "#151525";
+          ctx.fillRect(0, 0, ARENA_WIDTH, TILE_SIZE);
+          ctx.fillRect(0, ARENA_HEIGHT - TILE_SIZE, ARENA_WIDTH, TILE_SIZE);
+          ctx.fillRect(0, 0, TILE_SIZE, ARENA_HEIGHT);
+          ctx.fillRect(ARENA_WIDTH - TILE_SIZE, 0, TILE_SIZE, ARENA_HEIGHT);
+
+          // Border glow edge
+          const edgeGrad = ctx.createLinearGradient(0, 0, TILE_SIZE * 2, 0);
+          edgeGrad.addColorStop(0, "rgba(60,60,120,0.4)");
+          edgeGrad.addColorStop(1, "rgba(0,0,0,0)");
+          ctx.fillStyle = edgeGrad;
+          ctx.fillRect(0, 0, TILE_SIZE * 2, ARENA_HEIGHT);
         }
-
-        // Sacred rune circles at fixed positions (adds atmosphere)
-        drawRuneCircle(ctx, ARENA_PX * 0.5, ARENA_PX * 0.5, 280, "#1a1a40");
-        drawRuneCircle(ctx, ARENA_PX * 0.25, ARENA_PX * 0.25, 140, "#1a1830");
-        drawRuneCircle(ctx, ARENA_PX * 0.75, ARENA_PX * 0.75, 140, "#1a1830");
-        drawRuneCircle(ctx, ARENA_PX * 0.75, ARENA_PX * 0.25, 140, "#1a1830");
-        drawRuneCircle(ctx, ARENA_PX * 0.25, ARENA_PX * 0.75, 140, "#1a1830");
-        drawRuneCircle(ctx, ARENA_PX * 0.5, ARENA_PX * 0.15, 80, "#1a1825");
-        drawRuneCircle(ctx, ARENA_PX * 0.5, ARENA_PX * 0.85, 80, "#1a1825");
-        drawRuneCircle(ctx, ARENA_PX * 0.15, ARENA_PX * 0.5, 80, "#1a1825");
-        drawRuneCircle(ctx, ARENA_PX * 0.85, ARENA_PX * 0.5, 80, "#1a1825");
-
-        // Border wall decoration strip
-        ctx.fillStyle = "#151525";
-        ctx.fillRect(0, 0, ARENA_PX, TILE_SIZE);
-        ctx.fillRect(0, ARENA_PX - TILE_SIZE, ARENA_PX, TILE_SIZE);
-        ctx.fillRect(0, 0, TILE_SIZE, ARENA_PX);
-        ctx.fillRect(ARENA_PX - TILE_SIZE, 0, TILE_SIZE, ARENA_PX);
-
-        // Border glow edge
-        const edgeGrad = ctx.createLinearGradient(0, 0, TILE_SIZE * 2, 0);
-        edgeGrad.addColorStop(0, "rgba(60,60,120,0.4)");
-        edgeGrad.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.fillStyle = edgeGrad;
-        ctx.fillRect(0, 0, TILE_SIZE * 2, ARENA_PX);
 
         arenaTileCanvas = c;
         return c;
@@ -1965,7 +2334,8 @@
       // World scale: how many screen pixels = 1 world unit
       // Enemy positions are stored as world units ([-13..13] range from original code)
       const WORLD_SCALE = 38;
-      const WORLD_BOUNDS = 26; // enlarged arena to fit 20 players
+      const WORLD_BOUNDS_X = ARENA_WIDTH / 2 / WORLD_SCALE;
+      const WORLD_BOUNDS_Y = ARENA_HEIGHT / 2 / WORLD_SCALE;
 
       // Convert world coordinate to screen coordinate
       function worldToScreen(wx, wy) {
@@ -2013,6 +2383,10 @@
         score: 0,
         leaderboard: [],
         graves: [],
+        spectating: false, // true when player has died and chosen to spectate
+        playerName: "", // set from name prompt
+        spectatorTarget: null, // world coords to follow when spectating
+        currentLobbyId: null, // active lobby id for rejoining
       };
 
       let lastTimestamp = 0;
@@ -2096,7 +2470,8 @@
       function spawnEnemy(wave) {
         // Pick a random edge angle, spawn beyond visible range
         const angle = Math.random() * Math.PI * 2;
-        const dist = 14 + Math.random() * 6;
+        const edgeRadius = Math.max(WORLD_BOUNDS_X, WORLD_BOUNDS_Y) + 6;
+        const dist = edgeRadius + Math.random() * 4;
 
         let ex = Math.cos(angle) * dist;
         let ey = Math.sin(angle) * dist;
@@ -2122,7 +2497,7 @@
           }
           if (!tooClose) break;
           const a2 = Math.random() * Math.PI * 2;
-          const d2 = 14 + Math.random() * 6;
+          const d2 = edgeRadius + Math.random() * 4;
           ex = Math.cos(a2) * d2;
           ey = Math.sin(a2) * d2;
           tries++;
@@ -2164,33 +2539,14 @@
        * on the rune circles using time-based sine waves.
        */
       function renderFloor() {
-        const offX = canvas.width / 2 - ARENA_PX / 2 - CAM.x * WORLD_SCALE;
-        const offY = canvas.height / 2 - ARENA_PX / 2 - CAM.y * WORLD_SCALE;
+        const offX = canvas.width / 2 - ARENA_WIDTH / 2 - CAM.x * WORLD_SCALE;
+        const offY = canvas.height / 2 - ARENA_HEIGHT / 2 - CAM.y * WORLD_SCALE;
         ctx2d.imageSmoothingEnabled = false;
-        ctx2d.drawImage(arenaTileCanvas, offX, offY);
-
-        // Animated glowing rune circles (pulsing alpha on top of static floor)
-        const pulse = 0.04 + 0.025 * Math.sin(GS.time * 1.2);
-        const runeCenters = [
-          [0.5, 0.5, 180],
-          [0.25, 0.25, 80],
-          [0.75, 0.75, 80],
-          [0.75, 0.25, 80],
-          [0.25, 0.75, 80],
-        ];
-        for (const [rx, ry, rr] of runeCenters) {
-          const wx = (rx - 0.5) * (ARENA_PX / WORLD_SCALE);
-          const wy = (ry - 0.5) * (ARENA_PX / WORLD_SCALE);
-          const [sx, sy] = worldToScreen(wx, wy);
-          const sr = rr * (canvas.width / ARENA_PX) * (WORLD_SCALE / 40) * 2;
-          ctx2d.save();
-          ctx2d.globalAlpha = pulse;
-          ctx2d.strokeStyle = "#5555ff";
-          ctx2d.lineWidth = 1.5;
-          ctx2d.beginPath();
-          ctx2d.arc(sx, sy, sr, 0, Math.PI * 2);
-          ctx2d.stroke();
-          ctx2d.restore();
+        if (arenaTileCanvas) {
+          ctx2d.drawImage(arenaTileCanvas, offX, offY);
+        } else {
+          ctx2d.fillStyle = "#090910";
+          ctx2d.fillRect(0, 0, canvas.width, canvas.height);
         }
       }
 
@@ -2944,9 +3300,10 @@
         const spd = p.speed * dt;
         let nx = p.x + input.dx * spd;
         let ny = p.y + input.dy * spd;
-        const bound = WORLD_BOUNDS;
-        nx = Math.max(-bound, Math.min(bound, nx));
-        ny = Math.max(-bound, Math.min(bound, ny));
+        const boundX = WORLD_BOUNDS_X;
+        const boundY = WORLD_BOUNDS_Y;
+        nx = Math.max(-boundX, Math.min(boundX, nx));
+        ny = Math.max(-boundY, Math.min(boundY, ny));
         p.x = nx;
         p.y = ny;
         if (input.dx !== 0 || input.dy !== 0) {
@@ -3037,12 +3394,12 @@
             const angle = Math.random() * Math.PI * 2;
             const spd = bot.cls.speed * 0.4;
             bot.x = Math.max(
-              -WORLD_BOUNDS,
-              Math.min(WORLD_BOUNDS, bot.x + Math.cos(angle) * spd),
+              -WORLD_BOUNDS_X,
+              Math.min(WORLD_BOUNDS_X, bot.x + Math.cos(angle) * spd),
             );
             bot.y = Math.max(
-              -WORLD_BOUNDS,
-              Math.min(WORLD_BOUNDS, bot.y + Math.sin(angle) * spd),
+              -WORLD_BOUNDS_Y,
+              Math.min(WORLD_BOUNDS_Y, bot.y + Math.sin(angle) * spd),
             );
           }
           for (const e of GS.enemies) {
@@ -3118,7 +3475,9 @@
           }
           if (
             GS.projectiles[i] &&
-            (proj.life <= 0 || Math.abs(proj.x) > 20 || Math.abs(proj.y) > 20)
+            (proj.life <= 0 ||
+              Math.abs(proj.x) > WORLD_BOUNDS_X + 4 ||
+              Math.abs(proj.y) > WORLD_BOUNDS_Y + 4)
           ) {
             GS.projectiles.splice(i, 1);
           }
@@ -3696,11 +4055,52 @@
         }
       }
 
+      function clampCameraTarget(tx, ty) {
+        const halfScreenWorldX = canvas.width / 2 / WORLD_SCALE;
+        const halfScreenWorldY = canvas.height / 2 / WORLD_SCALE;
+        const maxCamX = ARENA_WIDTH / 2 / WORLD_SCALE - halfScreenWorldX;
+        const minCamX = -ARENA_WIDTH / 2 / WORLD_SCALE + halfScreenWorldX;
+        const maxCamY = ARENA_HEIGHT / 2 / WORLD_SCALE - halfScreenWorldY;
+        const minCamY = -ARENA_HEIGHT / 2 / WORLD_SCALE + halfScreenWorldY;
+
+        if (minCamX > maxCamX) tx = 0;
+        else tx = Math.max(minCamX, Math.min(maxCamX, tx));
+
+        if (minCamY > maxCamY) ty = 0;
+        else ty = Math.max(minCamY, Math.min(maxCamY, ty));
+
+        return [tx, ty];
+      }
+
       function updateCamera() {
         const p = GS.player;
-        if (!p || p.dead) return;
-        CAM.x += (p.x - CAM.x) * 0.1;
-        CAM.y += (p.y - CAM.y) * 0.1;
+        let tx = CAM.x,
+          ty = CAM.y;
+        if (GS.spectating) {
+          // Follow nearest alive remote player when spectating
+          let found = false;
+          for (const id in netPlayers) {
+            const np = netPlayers[id];
+            if (np && !np.dead) {
+              tx = np.x;
+              ty = np.y;
+              found = true;
+              break;
+            }
+          }
+          if (!found) {
+            tx = 0;
+            ty = 0;
+          }
+        } else {
+          if (!p || p.dead) return;
+          tx = p.x;
+          ty = p.y;
+        }
+
+        [tx, ty] = clampCameraTarget(tx, ty);
+        CAM.x += (tx - CAM.x) * 0.1;
+        CAM.y += (ty - CAM.y) * 0.1;
       }
 
       // ═══════════════════════════════════════════════════════════════════════
@@ -3741,16 +4141,23 @@
           .padStart(2, "0");
         document.getElementById("hud-time").textContent = mins + ":" + secs;
         document.getElementById("hud-wave").textContent = "WAVE " + GS.wave;
-        document.getElementById("hud-hp-bar").style.width =
-          (p.hp / p.maxHp) * 100 + "%";
-        document.getElementById("hud-hp-text").textContent =
-          Math.ceil(p.hp) + "/" + p.maxHp;
-        document.getElementById("hud-xp-bar").style.width =
-          (p.xp / p.xpNeeded) * 100 + "%";
-        document.getElementById("hud-xp-text").textContent =
-          p.xp + "/" + p.xpNeeded;
-        document.getElementById("hud-level").textContent = "LVL " + p.level;
+
+        if (!GS.spectating) {
+          document.getElementById("hud-hp-bar").style.width =
+            (p.hp / p.maxHp) * 100 + "%";
+          document.getElementById("hud-hp-text").textContent =
+            Math.ceil(p.hp) + "/" + p.maxHp;
+          document.getElementById("hud-xp-bar").style.width =
+            (p.xp / p.xpNeeded) * 100 + "%";
+          document.getElementById("hud-xp-text").textContent =
+            p.xp + "/" + p.xpNeeded;
+          document.getElementById("hud-level").textContent = "LVL " + p.level;
+        }
         document.getElementById("hud-kills").textContent = GS.kills;
+
+        // Score display
+        const scoreVal = document.getElementById("hud-score");
+        if (scoreVal) scoreVal.textContent = GS.player.score || GS.score || 0;
 
         const pList = document.getElementById("hud-players");
         pList.innerHTML = "";
@@ -3767,20 +4174,40 @@
 
         const abilBar = document.getElementById("hud-abilities");
         abilBar.innerHTML = "";
-        for (const ab of p.abilities) {
-          const def = ABILITIES[ab];
-          if (!def) continue;
-          const slot = document.createElement("div");
-          slot.className = "ability-slot active";
-          slot.innerHTML = `<span>${def.icon}</span><span class="akey">${def.name.substring(0, 6)}</span>`;
-          const cd = p.abilityCooldowns[ab] || 0;
-          if (cd > 0) {
-            const ov = document.createElement("div");
-            ov.className = "cd-overlay";
-            ov.textContent = cd.toFixed(1);
-            slot.appendChild(ov);
+        if (!GS.spectating) {
+          for (const ab of p.abilities) {
+            const def = ABILITIES[ab];
+            if (!def) continue;
+            const slot = document.createElement("div");
+            slot.className = "ability-slot active";
+            slot.innerHTML = `<span>${def.icon}</span><span class="akey">${def.name.substring(0, 6)}</span>`;
+            const cd = p.abilityCooldowns[ab] || 0;
+            if (cd > 0) {
+              const ov = document.createElement("div");
+              ov.className = "cd-overlay";
+              ov.textContent = cd.toFixed(1);
+              slot.appendChild(ov);
+            }
+            abilBar.appendChild(slot);
           }
-          abilBar.appendChild(slot);
+        }
+
+        // Leaderboard panel
+        const lbPanel = document.getElementById("leaderboard-panel");
+        const lbRows = document.getElementById("lb-rows");
+        if (lbRows && GS.leaderboard && GS.leaderboard.length > 0) {
+          lbPanel.classList.remove("hidden");
+          lbRows.innerHTML = "";
+          GS.leaderboard.slice(0, 10).forEach((entry, i) => {
+            const isYou = socket && entry.id === socket.id;
+            const row = document.createElement("div");
+            row.className =
+              "lb-row" +
+              (isYou ? " lb-you" : "") +
+              (entry.dead ? " lb-dead" : "");
+            row.innerHTML = `<span class="lb-rank">${i + 1}</span><span class="lb-name">${escapeHtml((entry.name || "?").substring(0, 10))}</span><span class="lb-score">${entry.score || 0}</span>`;
+            lbRows.appendChild(row);
+          });
         }
       }
 
@@ -4089,7 +4516,21 @@
 
       function checkMatchOver() {
         if (!GS.running) return;
-        if (GS.player && GS.player.dead) endMatch(false);
+        if (GS.player && GS.player.dead) {
+          // In multiplayer, offer spectate instead of ending immediately
+          if (socket && socket.connected) {
+            const ds = document.getElementById("death-stats");
+            ds.innerHTML = `
+              Wave Reached: <span>${GS.wave}</span><br>
+              Score: <span>${GS.score || GS.player.score || 0}</span><br>
+              Enemies Defeated: <span>${GS.kills}</span><br>
+              Level: <span>${GS.player.level}</span>`;
+            document.getElementById("death-modal").classList.remove("hidden");
+            // Keep GS.running = true so the world keeps ticking for spectators
+          } else {
+            endMatch(false);
+          }
+        }
       }
 
       function endMatch(survived) {
@@ -4215,6 +4656,8 @@
           .forEach((s) => s.classList.add("hidden"));
         document.getElementById("hud").classList.remove("hidden");
         document.getElementById("minimap-canvas").classList.remove("hidden");
+        document.getElementById("death-modal").classList.add("hidden");
+        document.getElementById("spectator-hud").classList.add("hidden");
 
         Object.assign(GS, {
           running: true,
@@ -4222,21 +4665,33 @@
           elapsed: 0,
           wave: 1,
           kills: 0,
+          score: 0,
           enemies: [],
           projectiles: [],
           particles: [],
           xpOrbs: [],
+          graves: [],
           frameCount: 0,
           lastSpawnTime: 0,
           time: 0,
+          spectating: false,
+          leaderboard: [],
         });
         waveEffects.length = 0;
         CAM.x = 0;
         CAM.y = 0;
 
-        GS.player = createPlayer(GS.selectedClass);
+        GS.player = createPlayer(GS.selectedClass, GS.playerName);
         document.getElementById("hud-name").textContent =
-          GS.player.cls.icon + " " + GS.player.cls.name.toUpperCase();
+          GS.player.cls.icon +
+          " " +
+          (GS.playerName || GS.player.cls.name.toUpperCase());
+        // Show leaderboard panel in multiplayer
+        if (socket) {
+          document
+            .getElementById("leaderboard-panel")
+            .classList.remove("hidden");
+        }
         spawnWave(1);
       }
 
@@ -4288,39 +4743,37 @@
         return c ? c.name : clsId;
       }
 
-      function startNetworkLobby() {
-        if (socket) {
-          socket.emit("rejoin");
+      function initSocket(onReady) {
+        if (socket && socket.connected) {
+          if (onReady) onReady();
           return;
         }
-        const name =
-          prompt(
-            "Enter your display name:",
-            "Player" + Math.floor(Math.random() * 1000),
-          ) || "Player" + Math.floor(Math.random() * 1000);
-        const cls = GS.selectedClass || "priest";
-        // Prefer explicit multiplayer server URL (override with ?server=...)
-        (function () {
-          const urlParams = new URLSearchParams(location.search);
-          const serverOverride = urlParams.get("server");
-          let serverUrl = serverOverride || "";
-          // If not overridden and not on localhost, use configured production server.
-          if (!serverUrl) {
-            if (
-              location.hostname !== "localhost" &&
-              location.hostname !== "127.0.0.1"
-            ) {
-              // TODO: replace with your deployed multiplayer server domain (e.g. https://your-server.onrender.com)
-              serverUrl = "https://YOUR_SERVER_DOMAIN";
-            }
+        // Prompt for name once
+        if (!GS.playerName) {
+          GS.playerName =
+            prompt(
+              "Enter your display name:",
+              "Player" + Math.floor(Math.random() * 1000),
+            ) || "Player" + Math.floor(Math.random() * 1000);
+        }
+
+        const urlParams = new URLSearchParams(location.search);
+        const serverOverride = urlParams.get("server");
+        let serverUrl = serverOverride || "";
+        if (!serverUrl) {
+          if (
+            location.hostname !== "localhost" &&
+            location.hostname !== "127.0.0.1"
+          ) {
+            serverUrl = "https://YOUR_SERVER_DOMAIN";
           }
-          socket = serverUrl
-            ? io(serverUrl, { transports: ["websocket", "polling"] })
-            : io();
-        })();
+        }
+        socket = serverUrl
+          ? io(serverUrl, { transports: ["websocket", "polling"] })
+          : io();
 
         socket.on("connect", () => {
-          socket.emit("join", { name, cls });
+          if (onReady) onReady();
         });
 
         socket.on("joinFailed", (msg) => {
@@ -4329,13 +4782,60 @@
             socket.disconnect();
           } catch (e) {}
           socket = null;
-          showScreen("title-screen");
+          showScreen("lobby-browser-screen");
         });
 
-        socket.on("lobbyState", (playersList, countdown) => {
+        socket.on("lobbyCreated", ({ lobbyId }) => {
+          GS.currentLobbyId = lobbyId;
+          document.getElementById("lobby-info").textContent =
+            "Arena ID: " + lobbyId + " \u00b7 Share this with friends!";
+          showScreen("lobby-screen");
+        });
+
+        socket.on("lobbyList", (list) => {
+          const container = document.getElementById("lobby-list");
+          if (!container) return;
+          if (!list || list.length === 0) {
+            container.innerHTML =
+              '<div class="lobby-empty">No arenas active. Create one!</div>';
+            return;
+          }
+          container.innerHTML = "";
+          for (const l of list) {
+            const full = l.players >= l.maxPlayers;
+            const div = document.createElement("div");
+            div.className =
+              "lobby-entry" +
+              (full ? " full" : "") +
+              (l.started ? " started" : "");
+            div.innerHTML = `
+              <div>
+                <div class="le-name">${escapeHtml(l.name)}</div>
+                <div class="le-meta">Host: ${escapeHtml(l.host)} \u00b7 ID: ${l.id}${l.started ? " \u00b7 IN PROGRESS" : ""}</div>
+              </div>
+              <div>
+                <div class="le-players">${l.players}/${l.maxPlayers}</div>
+                <div class="le-expires">\u23f1 ${Math.floor(l.expiresIn / 60)}m ${l.expiresIn % 60}s left</div>
+              </div>`;
+            if (!full) {
+              div.addEventListener("click", () => {
+                socket.emit("joinLobby", {
+                  lobbyId: l.id,
+                  cls: GS.selectedClass,
+                  playerName: GS.playerName,
+                });
+                GS.currentLobbyId = l.id;
+                showScreen("lobby-screen");
+              });
+            }
+            container.appendChild(div);
+          }
+        });
+
+        socket.on("lobbyState", (playersList) => {
           const grid = document.getElementById("lobby-grid");
           grid.innerHTML = "";
-          for (let i = 0; i < 20; i++) {
+          for (let i = 0; i < 10; i++) {
             const p = (playersList && playersList[i]) || null;
             const slot = document.createElement("div");
             if (p) {
@@ -4343,18 +4843,13 @@
                 "lobby-slot filled" + (p.id === socket.id ? " you" : "");
               const icon = getClassIcon(p.cls);
               const clsName = getClassName(p.cls);
-              slot.innerHTML = `<div class="slot-icon">${icon}</div><div class="slot-name">${escapeHtml(
-                p.name,
-              )}</div><div class="slot-class">${escapeHtml(clsName)}</div>`;
+              slot.innerHTML = `<div class="slot-icon">${icon}</div><div class="slot-name">${escapeHtml(p.name)}</div><div class="slot-class">${escapeHtml(clsName)}</div>`;
             } else {
               slot.className = "lobby-slot";
-              slot.innerHTML = `<div class="slot-empty">WAITING...</div>`;
+              slot.innerHTML = '<div class="slot-empty">WAITING...</div>';
             }
             grid.appendChild(slot);
           }
-          if (typeof countdown !== "undefined")
-            document.getElementById("lobby-countdown").textContent =
-              countdown + "s";
         });
 
         socket.on("startMatch", (initState) => {
@@ -4362,8 +4857,7 @@
           if (initState && Array.isArray(initState.playerStates)) {
             for (const p of initState.playerStates) netPlayers[p.id] = p;
           }
-          // Create a local player instance (client logic still drives abilities/enemies)
-          GS.player = createPlayer(GS.selectedClass);
+          GS.player = createPlayer(GS.selectedClass, GS.playerName);
           startMatch();
           startSendingInputs();
         });
@@ -4374,13 +4868,19 @@
           netPlayers = map;
         });
 
-        // Remote projectile from another client
         socket.on("projectile", (proj) => {
           try {
             if (!proj) return;
+            let spawnX = proj.x,
+              spawnY = proj.y;
+            if (proj.sentAt) {
+              const lag = Math.min((Date.now() - proj.sentAt) / 1000, 0.5);
+              spawnX = proj.x + proj.dx * lag;
+              spawnY = proj.y + proj.dz * lag;
+            }
             fireProjectile(
-              proj.x,
-              proj.y,
+              spawnX,
+              spawnY,
               proj.dx,
               proj.dz,
               proj.damage,
@@ -4393,21 +4893,19 @@
           } catch (e) {}
         });
 
-        // Session leaderboard update
         socket.on("leaderboard", (lb) => {
           try {
             GS.leaderboard = lb || [];
           } catch (e) {}
         });
 
-        // Player died elsewhere — add grave marker and update leaderboard
         socket.on("playerDied", (payload) => {
           try {
             if (!payload) return;
             GS.graves.push({
               x: payload.x || 0,
               y: payload.y || 0,
-              name: payload.name || "",
+              name: payload.name || "Unknown",
               wave: payload.wave || 0,
               score: payload.score || 0,
             });
@@ -4415,7 +4913,20 @@
           } catch (e) {}
         });
 
-        // Remote ability visual effects
+        socket.on("playerClassChanged", ({ id, cls }) => {
+          try {
+            if (netPlayers[id]) netPlayers[id].cls = cls;
+            if (!SpriteCache["player_" + cls]) {
+              const data = CLASS_PIXELS[cls];
+              if (data) {
+                const c = document.createElement("canvas");
+                drawPixelArt(c, data.pixels, data.palette);
+                SpriteCache["player_" + cls] = c;
+              }
+            }
+          } catch (e) {}
+        });
+
         socket.on("ability", (data) => {
           try {
             if (!data) return;
@@ -4445,12 +4956,34 @@
           } catch (e) {}
         });
 
+        socket.on("lobbyExpired", () => {
+          alert(
+            "This arena has expired (15-min limit). Returning to lobby browser.",
+          );
+          GS.running = false;
+          GS.spectating = false;
+          stopSendingInputs();
+          showScreen("lobby-browser-screen");
+          if (socket) socket.emit("listLobbies");
+        });
+
         socket.on("disconnect", () => {
           stopSendingInputs();
           socket = null;
           netPlayers = {};
           alert("Disconnected from multiplayer server.");
           showScreen("title-screen");
+        });
+      }
+
+      // Legacy alias
+      function startNetworkLobby() {
+        initSocket(() => {
+          if (socket)
+            socket.emit("rejoin", {
+              cls: GS.selectedClass,
+              playerName: GS.playerName,
+            });
         });
       }
 
@@ -4525,16 +5058,96 @@
         document
           .getElementById("btn-play")
           .addEventListener("click", () => showScreen("class-screen"));
+
+        document
+          .getElementById("btn-multiplayer")
+          .addEventListener("click", () => {
+            // Jump straight to class select, then from there to lobby browser
+            GS.multiplayerMode = true;
+            showScreen("class-screen");
+            // Change the "Enter Lobby" button label to "Browse Arenas"
+            const enterBtn = document.getElementById("btn-to-lobby");
+            enterBtn.textContent = "BROWSE ARENAS ►";
+          });
+
+        document
+          .getElementById("btn-browser-back")
+          .addEventListener("click", () => showScreen("class-screen"));
+
+        document
+          .getElementById("btn-refresh-lobbies")
+          .addEventListener("click", () => {
+            if (socket) socket.emit("listLobbies");
+          });
+
+        document
+          .getElementById("btn-create-lobby")
+          .addEventListener("click", () => {
+            if (!socket) {
+              initSocket(() => {
+                socket.emit("createLobby", {
+                  name: GS.playerName + "'s Lobby",
+                  cls: GS.selectedClass,
+                  playerName: GS.playerName,
+                });
+              });
+            } else {
+              socket.emit("createLobby", {
+                name: GS.playerName + "'s Lobby",
+                cls: GS.selectedClass,
+                playerName: GS.playerName,
+              });
+            }
+          });
+
+        document
+          .getElementById("btn-spectate")
+          .addEventListener("click", () => {
+            document.getElementById("death-modal").classList.add("hidden");
+            GS.spectating = true;
+            document.getElementById("spectator-hud").classList.remove("hidden");
+            document
+              .getElementById("leaderboard-panel")
+              .classList.remove("hidden");
+          });
+
+        document
+          .getElementById("btn-leave-match")
+          .addEventListener("click", () => {
+            document.getElementById("death-modal").classList.add("hidden");
+            GS.running = false;
+            GS.spectating = false;
+            document.getElementById("spectator-hud").classList.add("hidden");
+            stopSendingInputs();
+            showScreen("title-screen");
+          });
+
+        document
+          .getElementById("btn-back-to-menu")
+          .addEventListener("click", () => {
+            document.getElementById("end-screen").classList.add("hidden");
+            showScreen("title-screen");
+            GS.running = false;
+          });
         document
           .getElementById("btn-back-title")
           .addEventListener("click", () => showScreen("title-screen"));
         document
           .getElementById("btn-to-lobby")
           .addEventListener("click", () => {
-            showScreen("lobby-screen");
-            if (typeof io !== "undefined") {
-              startNetworkLobby();
+            if (GS.multiplayerMode && typeof io !== "undefined") {
+              // Go to lobby browser; init socket first if needed
+              if (!socket) {
+                initSocket(() => {
+                  socket.emit("listLobbies");
+                  showScreen("lobby-browser-screen");
+                });
+              } else {
+                socket.emit("listLobbies");
+                showScreen("lobby-browser-screen");
+              }
             } else {
+              showScreen("lobby-screen");
               buildLobby();
               startLobbyCountdown();
             }
