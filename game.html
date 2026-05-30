@@ -1045,16 +1045,16 @@
           religion: "Christianity",
           icon: "✝",
           color: "#88aaff",
-          desc: "Healer & protector. Shields allies with holy light.",
+          desc: "Healer & protector. Smites foes with holy wrath.",
           hp: 120,
           speed: 2.2,
-          startAbility: "smite",
+          startAbility: null, // innate ability handled separately
+          innateAbility: "smite",
           abilityPool: [
             "holy_light",
             "blessing",
             "sacred_barrier",
             "resurrection_bell",
-            "smite",
             "choir",
           ],
           colorRGB: [136, 170, 255],
@@ -1066,15 +1066,15 @@
           icon: "☸",
           color: "#ffaa44",
           desc: "Disciplined defender. Turns inner peace to steel.",
-          hp: 100,
-          speed: 2.6,
-          startAbility: "lotus_strike",
+          hp: 105,
+          speed: 2.5,
+          startAbility: null,
+          innateAbility: "lotus_strike",
           abilityPool: [
             "meditation",
-            "lotus_strike",
             "diamond_mind",
             "bell_of_peace",
-            "kesa_spin",
+            "samsara",
             "nirvana_pulse",
           ],
           colorRGB: [255, 170, 68],
@@ -1086,15 +1086,15 @@
           icon: "☽",
           color: "#44ddaa",
           desc: "Whirling mystic. Speed and spinning devastation.",
-          hp: 90,
-          speed: 3.2,
-          startAbility: "crescent_slash",
+          hp: 95,
+          speed: 3.0,
+          startAbility: null,
+          innateAbility: "crescent_slash",
           abilityPool: [
+            "sufi_step",
+            "wax_and_wane",
             "whirl",
             "zikr_wave",
-            "crescent_slash",
-            "basmala_shield",
-            "sufi_step",
             "divine_geometry",
           ],
           colorRGB: [68, 221, 170],
@@ -1105,16 +1105,16 @@
           religion: "Hinduism",
           icon: "🕉",
           color: "#ff88cc",
-          desc: "Elemental master. Channels chakra into attacks.",
+          desc: "Elemental master. Channels chakra into blazing beams.",
           hp: 95,
           speed: 2.4,
-          startAbility: "chakra_beam",
+          startAbility: null,
+          innateAbility: "chakra_beam",
           abilityPool: [
-            "chakra_beam",
-            "fire_mandala",
-            "om_pulse",
             "lotus_barrier",
+            "om_surge",
             "third_eye",
+            "fire_mandala",
             "avatar_form",
           ],
           colorRGB: [255, 136, 204],
@@ -1125,16 +1125,16 @@
           religion: "Shinto",
           icon: "⛩",
           color: "#ff4466",
-          desc: "Spirit guardian. Purifies evil with ancient charms.",
+          desc: "Spirit guardian. Purifies evil with paper charms.",
           hp: 105,
           speed: 2.5,
-          startAbility: "ofuda",
+          startAbility: null,
+          innateAbility: "ofuda",
           abilityPool: [
-            "ofuda",
             "torii_gate",
             "spirit_fox",
-            "purify_aura",
-            "harae_wave",
+            "omamori_charm",
+            "harae_aura",
             "kagura_dance",
           ],
           colorRGB: [255, 68, 102],
@@ -1142,305 +1142,347 @@
       ];
 
       const ABILITIES = {
+        // ── INNATE (not in reward pool) ──────────────────────────────────────
+        smite: {
+          name: "Smite",
+          icon: "⚡",
+          desc: "AOE lightning strike on nearest enemy. Scales with level.",
+          color: "#ffff44",
+          type: "innate_smite",
+          damage: 32,
+          radius: 2.0,
+          cd: 2.2,
+          passive: false,
+          innate: true,
+        },
+        lotus_strike: {
+          name: "Lotus Strike",
+          icon: "🌸",
+          desc: "Ring of petals fire outward in all directions. Scales with level.",
+          color: "#ffaacc",
+          type: "innate_lotus",
+          damage: 18,
+          cd: 2.8,
+          passive: false,
+          innate: true,
+        },
+        crescent_slash: {
+          name: "Crescent Slash",
+          icon: "☽",
+          desc: "Wide arc slash toward nearest enemy. Scales with level.",
+          color: "#aaffee",
+          type: "innate_crescent",
+          damage: 28,
+          cd: 1.8,
+          passive: false,
+          innate: true,
+        },
+        chakra_beam: {
+          name: "Chakra Beam",
+          icon: "🔥",
+          desc: "Piercing beam hits all enemies in line. Scales with level.",
+          color: "#ff88cc",
+          type: "innate_beam",
+          damage: 20,
+          cd: 0.9,
+          passive: false,
+          innate: true,
+        },
+        ofuda: {
+          name: "Ofuda",
+          icon: "📜",
+          desc: "Cone of paper charms. Scales with level.",
+          color: "#ff4466",
+          type: "innate_ofuda",
+          damage: 22,
+          cd: 1.4,
+          passive: false,
+          innate: true,
+        },
+
+        // ── PRIEST MILESTONE ABILITIES ───────────────────────────────────────
         holy_light: {
           name: "Holy Light",
           icon: "✦",
-          desc: "Radiant aura damages nearby enemies",
+          desc: "Radiant burst heals you & allies, damages enemies nearby.",
           color: "#88aaff",
-          type: "aura",
-          damage: 12,
+          type: "holy_light",
+          damage: 10,
+          heal: 18,
           radius: 3.5,
-          cd: 0,
-          passive: true,
+          cd: 6,
+          passive: false,
         },
         blessing: {
           name: "Blessing",
           icon: "✝",
-          desc: "Heals you over time",
+          desc: "Heals and buffs damage of nearby allies over 5s.",
           color: "#88ffaa",
-          type: "heal",
-          healRate: 3,
-          cd: 0,
-          passive: true,
+          type: "blessing",
+          healPerSec: 4,
+          damageBuff: 0.15,
+          duration: 5,
+          cd: 12,
+          passive: false,
         },
         sacred_barrier: {
           name: "Sacred Barrier",
           icon: "🛡",
-          desc: "Periodic shield absorbs hits",
+          desc: "Grants a shield that absorbs damage. Recharges after breaking.",
           color: "#88aaff",
           type: "shield",
-          cd: 8,
-          duration: 3,
+          shieldAmt: 50,
+          cd: 10,
           passive: false,
         },
         resurrection_bell: {
           name: "Resurrection Bell",
           icon: "🔔",
-          desc: "A ring of bells orbits you",
+          desc: "Orbiting bells damage enemies. On near-death, restore 40% HP.",
           color: "#ffffaa",
-          type: "orbit",
-          damage: 18,
+          type: "resurrection_bell",
+          damage: 14,
+          healPct: 0.4,
           cd: 0,
           passive: true,
-        },
-        smite: {
-          name: "Smite",
-          icon: "⚡",
-          desc: "Bolt strikes closest enemy",
-          color: "#ffff44",
-          type: "bolt",
-          damage: 45,
-          cd: 2.5,
-          passive: false,
         },
         choir: {
           name: "Choir",
           icon: "🎵",
-          desc: "Slow aura around you",
+          desc: "Sacred song slows enemies within range by 15%.",
           color: "#aaaaff",
           type: "slow",
+          slowAmt: 0.15,
+          radius: 5,
           cd: 0,
           passive: true,
         },
+
+        // ── MONK MILESTONE ABILITIES ─────────────────────────────────────────
         meditation: {
           name: "Meditation",
           icon: "🧘",
-          desc: "Reduces damage taken by 20%",
+          desc: "Heals you while standing still.",
           color: "#ffaa44",
-          type: "buff",
-          reduction: 0.2,
+          type: "meditation",
+          healPerSec: 6,
           cd: 0,
           passive: true,
-        },
-        lotus_strike: {
-          name: "Lotus Strike",
-          icon: "🌸",
-          desc: "Petal ring fires outward",
-          color: "#ffaacc",
-          type: "burst",
-          damage: 22,
-          cd: 3,
-          passive: false,
         },
         diamond_mind: {
           name: "Diamond Mind",
           icon: "💎",
-          desc: "Deflects projectiles occasionally",
+          desc: "Chance to deflect enemy damage or projectiles.",
           color: "#aaffff",
           type: "reflect",
+          deflectChance: 0.15,
           cd: 0,
           passive: true,
         },
         bell_of_peace: {
           name: "Bell of Peace",
           icon: "🔔",
-          desc: "Healing wave every 10 seconds",
+          desc: "Periodically emits a shockwave that pushes enemies back.",
           color: "#ffee88",
-          type: "heal",
-          healAmt: 25,
-          cd: 10,
+          type: "bell_push",
+          pushRadius: 4.5,
+          pushForce: 3.5,
+          cd: 8,
           passive: false,
         },
-        kesa_spin: {
-          name: "Kesa Spin",
+        samsara: {
+          name: "Samsara",
           icon: "🌀",
-          desc: "Spinning cloth hits enemies nearby",
-          color: "#ffaa44",
-          type: "spin",
-          damage: 20,
+          desc: "Summons a Monk image that mirrors your attacks at 15% proficiency.",
+          color: "#ffcc88",
+          type: "samsara",
+          proficiency: 0.15,
           cd: 0,
           passive: true,
         },
         nirvana_pulse: {
           name: "Nirvana Pulse",
           icon: "✨",
-          desc: "Expand/shrink wave every 6s",
+          desc: "Spawns expanding pillars in a circle — outer pillars deal less damage.",
           color: "#ffffff",
-          type: "wave",
-          damage: 40,
-          cd: 6,
+          type: "nirvana_pulse",
+          damage: 38,
+          cd: 7,
+          passive: false,
+        },
+
+        // ── DERVISH MILESTONE ABILITIES ──────────────────────────────────────
+        sufi_step: {
+          name: "Sufi Step",
+          icon: "👣",
+          desc: "Periodically restrains enemies in cloth. Striking restrained foes lifesteal.",
+          color: "#44ddaa",
+          type: "sufi_step",
+          lifeSteal: 0.2,
+          cd: 9,
+          passive: false,
+        },
+        wax_and_wane: {
+          name: "Wax & Wane",
+          icon: "🌙",
+          desc: "Expands/shrinks — heals if hits enemies, harms you if misses.",
+          color: "#88ffcc",
+          type: "wax_wane",
+          healAmt: 20,
+          selfDmg: 8,
+          radius: 4,
+          cd: 7,
           passive: false,
         },
         whirl: {
           name: "Whirl",
           icon: "🌀",
-          desc: "Constant spin attack around you",
+          desc: "Periodic spinning attack deals damage in a radius around you.",
           color: "#44ddaa",
-          type: "spin",
-          damage: 15,
+          type: "whirl",
+          damage: 22,
           radius: 2.5,
-          cd: 0,
-          passive: true,
+          cd: 5,
+          passive: false,
         },
         zikr_wave: {
           name: "Zikr Wave",
           icon: "🌊",
-          desc: "Pulse wave of remembrance",
+          desc: "Reduces enemy armor in a cone, making them take more damage.",
           color: "#44ddaa",
-          type: "wave",
-          damage: 30,
-          cd: 5,
+          type: "zikr_wave",
+          armorReduce: 0.2,
+          duration: 4,
+          cd: 8,
           passive: false,
-        },
-        crescent_slash: {
-          name: "Crescent Slash",
-          icon: "☽",
-          desc: "Fires crescent projectile forward",
-          color: "#aaffee",
-          type: "proj",
-          damage: 35,
-          cd: 2,
-          passive: false,
-        },
-        basmala_shield: {
-          name: "Basmala Shield",
-          icon: "✨",
-          desc: "Blessing shield on low health",
-          color: "#44ffaa",
-          type: "shield",
-          threshold: 0.3,
-          cd: 15,
-          passive: true,
-        },
-        sufi_step: {
-          name: "Sufi Step",
-          icon: "👣",
-          desc: "Increases movement speed +30%",
-          color: "#44ddaa",
-          type: "buff",
-          speedMult: 1.3,
-          cd: 0,
-          passive: true,
         },
         divine_geometry: {
           name: "Divine Geometry",
           icon: "⬡",
-          desc: "Geometric projectile pattern",
+          desc: "Marks struck enemies for bonus damage; marks stack.",
           color: "#44ffcc",
-          type: "burst",
-          damage: 28,
-          cd: 4,
-          passive: false,
-        },
-        chakra_beam: {
-          name: "Chakra Beam",
-          icon: "🔥",
-          desc: "Aimed beam in facing direction",
-          color: "#ff88cc",
-          type: "beam",
-          damage: 25,
+          type: "divine_geometry",
+          markDmgBonus: 0.18,
           cd: 0,
           passive: true,
         },
-        fire_mandala: {
-          name: "Fire Mandala",
-          icon: "🌺",
-          desc: "Rotating fire ring",
-          color: "#ff4400",
-          type: "ring",
-          damage: 20,
-          cd: 0,
-          passive: true,
-        },
-        om_pulse: {
-          name: "Om Pulse",
-          icon: "🕉",
-          desc: "Sacred sound knocks back enemies",
-          color: "#ffaaff",
-          type: "wave",
-          damage: 25,
-          cd: 7,
-          passive: false,
-        },
+
+        // ── YOGI MILESTONE ABILITIES ─────────────────────────────────────────
         lotus_barrier: {
           name: "Lotus Barrier",
           icon: "🌸",
-          desc: "Floating lotuses orbit you",
+          desc: "Shield + damage bonus when below 20% HP.",
           color: "#ff88cc",
-          type: "orbit",
-          damage: 16,
-          cd: 0,
+          type: "lotus_barrier",
+          shieldAmt: 45,
+          dmgBonus: 0.25,
+          threshold: 0.2,
+          cd: 14,
           passive: true,
+        },
+        om_surge: {
+          name: "Om Surge",
+          icon: "🕉",
+          desc: "Zip through battlefield leaving a trail of fire.",
+          color: "#ffaaff",
+          type: "om_surge",
+          burnDps: 8,
+          burnDur: 3,
+          cd: 9,
+          passive: false,
         },
         third_eye: {
           name: "Third Eye",
           icon: "👁",
-          desc: "Reveals weak spots — +25% crit",
+          desc: "Periodic burst of fiery energy burns nearby enemies.",
           color: "#ff88ff",
-          type: "buff",
-          critMult: 1.25,
+          type: "third_eye",
+          damage: 22,
+          burnDps: 6,
+          burnDur: 2,
+          radius: 3.5,
+          cd: 8,
+          passive: false,
+        },
+        fire_mandala: {
+          name: "Fire Mandala",
+          icon: "🌺",
+          desc: "Rotating fire rings orbit you, burning enemies on contact.",
+          color: "#ff4400",
+          type: "fire_mandala",
+          damage: 16,
+          burnDps: 5,
+          burnDur: 2,
           cd: 0,
           passive: true,
         },
         avatar_form: {
           name: "Avatar Form",
           icon: "🔱",
-          desc: "Briefly become unstoppable",
+          desc: "Periodically become invincible for 3 seconds.",
           color: "#ffaa44",
-          type: "buff",
-          cd: 20,
-          duration: 4,
+          type: "avatar_form",
+          duration: 3,
+          cd: 25,
           passive: false,
         },
-        ofuda: {
-          name: "Ofuda",
-          icon: "📜",
-          desc: "Paper charm homes in on enemies",
-          color: "#ff4466",
-          type: "proj",
-          damage: 28,
-          cd: 1.5,
-          passive: false,
-        },
+
+        // ── SHRINE MAIDEN MILESTONE ABILITIES ───────────────────────────────
         torii_gate: {
           name: "Torii Gate",
           icon: "⛩",
-          desc: "Stationary gate zaps enemies",
+          desc: "Summons a Torii Gate that blasts nearby enemies.",
           color: "#ff4466",
-          type: "totem",
-          damage: 30,
-          cd: 0,
+          type: "torii_gate",
+          damage: 26,
+          range: 5,
+          cd: 15,
           passive: false,
         },
         spirit_fox: {
           name: "Spirit Fox",
           icon: "🦊",
-          desc: "Fox companion attacks for you",
+          desc: "Fox companion attacks for you at 10% proficiency. Respawns after death.",
           color: "#ff8844",
-          type: "companion",
-          damage: 22,
+          type: "spirit_fox",
+          proficiency: 0.1,
           cd: 0,
           passive: true,
         },
-        purify_aura: {
-          name: "Purify Aura",
-          icon: "✨",
-          desc: "Aura purifies (damages) undead+",
-          color: "#ffffcc",
-          type: "aura",
-          damage: 18,
-          radius: 4,
+        omamori_charm: {
+          name: "Omamori Charm",
+          icon: "🧿",
+          desc: "Buffs nearby Torii Gates and Fox Spirit damage and health.",
+          color: "#ffccaa",
+          type: "omamori_charm",
+          dmgBuff: 0.2,
+          radius: 5,
           cd: 0,
           passive: true,
         },
-        harae_wave: {
-          name: "Harae Wave",
+        harae_aura: {
+          name: "Harae Aura",
           icon: "🌊",
-          desc: "Purification wave clears area",
+          desc: "Heals Torii Gates & Fox. They absorb 25% of damage meant for you.",
           color: "#ffcccc",
-          type: "wave",
-          damage: 50,
-          cd: 8,
-          passive: false,
+          type: "harae_aura",
+          absorbPct: 0.25,
+          healPerSec: 3,
+          radius: 6,
+          cd: 0,
+          passive: true,
         },
         kagura_dance: {
           name: "Kagura Dance",
           icon: "💃",
-          desc: "Dance reduces enemy speed -40%",
+          desc: "Creates a sakura field that heals allies and slows enemies.",
           color: "#ff4466",
-          type: "slow",
-          cd: 0,
-          passive: true,
+          type: "kagura_dance",
+          slowAmt: 0.35,
+          healPerSec: 4,
+          radius: 4,
+          cd: 18,
+          passive: false,
         },
       };
 
@@ -1771,6 +1813,9 @@
         specter: "Assets/Specter.png",
         demon: "Assets/Demon.png",
         revenant: "Assets/Revenant.png",
+        comp_fox: "Assets/Fox.png",
+        sword: "Assets/Sword.png",
+        torii: "Assets/Torii.png",
       };
 
       function loadSpriteImage(id, src) {
@@ -1812,6 +1857,52 @@
             ctx.fillStyle = palette[idx] || "#fff";
             ctx.fillRect(x, y, 1, 1);
           }
+        }
+      }
+
+      function updateMeleeAttacks(dt) {
+        if (!GS.meleeAttacks) return;
+        for (let i = GS.meleeAttacks.length - 1; i >= 0; i--) {
+          const m = GS.meleeAttacks[i];
+          m.life -= dt;
+          for (const e of GS.enemies) {
+            if (!e.alive) continue;
+            // skip already-hit targets
+            m._hit = m._hit || new Set();
+            if (m._hit.has(e)) continue;
+            const dx = e.x - m.x,
+              dy = e.y - m.y;
+            const d2 = dx * dx + dy * dy;
+            if (d2 > (m.range || 5) * (m.range || 5)) continue;
+            const angTo = Math.atan2(dy, dx);
+            const diff = Math.abs(
+              ((angTo - m.angle + Math.PI) % (2 * Math.PI)) - Math.PI,
+            );
+            if (diff <= (m.arc || 1.0) / 2) {
+              let actualDamage = m.damage;
+              if (m.owner === "player" && GS.player) {
+                const pp = GS.player;
+                actualDamage *= pp.damageMult || 1;
+                if (pp.blessingActive && pp.blessingDamageBuff)
+                  actualDamage *= 1 + pp.blessingDamageBuff;
+                if (m.sourceAbility) {
+                  const rank =
+                    (pp.abilityRanks && pp.abilityRanks[m.sourceAbility]) || 1;
+                  actualDamage *= 1 + 0.2 * (rank - 1);
+                }
+                if (Math.random() < (pp.critChance || 0.05))
+                  actualDamage *= pp.critMult || 1.5;
+              }
+              hitEnemy(e, actualDamage);
+              spawnParticles(e.x, e.y, m.color || "#aaffee", 6);
+              m._hit.add(e);
+              if (m.hasLifesteal && GS.player) {
+                const heal = actualDamage * (m.lifeStealPct || 0);
+                GS.player.hp = Math.min(GS.player.maxHp, GS.player.hp + heal);
+              }
+            }
+          }
+          if (m.life <= 0) GS.meleeAttacks.splice(i, 1);
         }
       }
 
@@ -2093,6 +2184,11 @@
             buildSprite("enemy_" + et.id, ENEMY_PIXELS[et.id], et.size * 2);
           }
         }
+        // Load small additional art (companion fox, sword slash, torii gate)
+        const extra = ["comp_fox", "sword", "torii"];
+        for (const k of extra) {
+          if (IMAGE_SPRITE_PATHS[k]) loadSpriteImage(k, IMAGE_SPRITE_PATHS[k]);
+        }
       }
 
       // ═══════════════════════════════════════════════════════════════════════
@@ -2372,6 +2468,7 @@
         player: null,
         enemies: [],
         projectiles: [],
+        meleeAttacks: [],
         particles: [],
         xpOrbs: [],
         floatingTexts: [],
@@ -2442,33 +2539,57 @@
           ...(Object.values(netPlayers || {}) || []),
         ].filter(Boolean);
         const spawn = getSpawnPosition(nearbyPlayers);
+        const innateAb = cls.innateAbility || cls.startAbility;
         return {
           cls,
           x: spawn.x,
-          y: spawn.y, // world position (y = depth axis, same as old z)
+          y: spawn.y,
           hp: cls.hp,
           maxHp: cls.hp,
           speed: cls.speed,
           xp: 0,
           xpNeeded: 50,
           level: 1,
-          abilities: [cls.startAbility],
+          abilities: innateAb ? [innateAb] : [],
           abilityTimers: {},
           abilityCooldowns: {},
-          // persistent player stats (scalable by stat-level ups)
+          innateTimer: 0,
           damageMult: 1,
-          critMult: 1,
+          critMult: 1.5,
+          critChance: 0.05,
           defense: 0,
+          evasion: 0,
+          accuracy: 1.0,
+          hpRegen: 0,
+          shootSpeed: 1.0,
           cooldownReduction: 0,
-          // per-player ability upgrade ranks: 1 = base
-          abilityRanks: { [cls.startAbility]: 1 },
+          abilityRanks: { [innateAb]: 1 },
           shieldActive: false,
+          shieldHp: 0,
+          maxShieldHp: 0,
+          avatarInvincible: false,
+          blessingActive: false,
+          blessingTimer: 0,
+          blessingDamageBuff: 0,
+          kaguraActive: false,
+          kaguraTimer: 0,
+          foxDead: false,
+          foxRespawnTimer: 0,
+          foxX: 0,
+          foxY: 0,
+          samsaraX: 0,
+          samsaraY: 0,
+          toriGates: [],
+          resurrectionUsed: false,
+          burnedEnemies: new Map(),
+          markedEnemies: new Map(),
+          armoredWeakened: new Map(),
           dead: false,
           kills: 0,
           facing: { x: 1, y: 0 },
           orbitAngle: 0,
-          bobPhase: 0, // animation bobbing phase
-          hitFlash: 0, // flash timer when hit
+          bobPhase: 0,
+          hitFlash: 0,
           score: 0,
           name: name || "",
         };
@@ -2688,11 +2809,8 @@
           ctx2d.restore();
         }
 
-        // Orbit projectiles (resurrection_bell / lotus_barrier)
-        if (
-          p.abilities.includes("resurrection_bell") ||
-          p.abilities.includes("lotus_barrier")
-        ) {
+        // Orbit projectiles (resurrection_bell)
+        if (p.abilities.includes("resurrection_bell")) {
           const [r, g, b] = p.cls.colorRGB;
           for (let i = 0; i < 3; i++) {
             const a = p.orbitAngle + (i / 3) * Math.PI * 2;
@@ -2726,11 +2844,139 @@
           }
         }
 
-        // Spin ring (whirl / kesa_spin)
-        if (
-          p.abilities.includes("whirl") ||
-          p.abilities.includes("kesa_spin")
-        ) {
+        // Avatar invincibility glow
+        if (p.avatarInvincible) {
+          ctx2d.save();
+          ctx2d.globalAlpha = 0.3 + 0.2 * Math.sin(GS.time * 8);
+          ctx2d.shadowColor = "#ffaa44";
+          ctx2d.shadowBlur = 30;
+          ctx2d.strokeStyle = "#ffaa44";
+          ctx2d.lineWidth = 3;
+          ctx2d.beginPath();
+          ctx2d.arc(sx, sy, sprSize * 0.7, 0, Math.PI * 2);
+          ctx2d.stroke();
+          ctx2d.restore();
+        }
+
+        // Shield HP bar (above player)
+        if (p.shieldActive && p.shieldHp > 0 && p.maxShieldHp > 0) {
+          const shieldPct = p.shieldHp / p.maxShieldHp;
+          const bw = 40,
+            bh = 4,
+            bx = sx - bw / 2,
+            by = sy - sprSize / 2 - 12;
+          ctx2d.save();
+          ctx2d.fillStyle = "#111";
+          ctx2d.fillRect(bx, by, bw, bh);
+          ctx2d.fillStyle = "#88aaff";
+          ctx2d.fillRect(bx, by, bw * shieldPct, bh);
+          ctx2d.restore();
+        }
+
+        // Samsara mirror image
+        if (p.abilities.includes("samsara")) {
+          const [smx, smy] = worldToScreen(
+            p.samsaraX || p.x - 0.8,
+            p.samsaraY || p.y - 0.8,
+          );
+          const spr2 = SpriteCache["player_" + p.cls.id];
+          if (spr2) {
+            ctx2d.save();
+            ctx2d.globalAlpha = 0.38;
+            ctx2d.imageSmoothingEnabled = false;
+            ctx2d.drawImage(
+              spr2,
+              smx - sprSize / 2,
+              smy - sprSize / 2,
+              sprSize,
+              sprSize,
+            );
+            ctx2d.restore();
+          }
+        }
+
+        // Torii Gates (draw using art if available)
+        for (const gate of p.toriGates || []) {
+          const [gsx, gsy] = worldToScreen(gate.x, gate.y);
+          ctx2d.save();
+          const toriiImg = SpriteCache["torii"];
+          if (toriiImg) {
+            const w = WORLD_SCALE * 2.0;
+            const h = WORLD_SCALE * 2.0;
+            ctx2d.imageSmoothingEnabled = false;
+            ctx2d.drawImage(toriiImg, gsx - w / 2, gsy - h / 2 - 8, w, h);
+          } else {
+            ctx2d.strokeStyle = "#ff4466";
+            ctx2d.lineWidth = 2;
+            ctx2d.shadowColor = "#ff4466";
+            ctx2d.shadowBlur = 8;
+            // Draw simple torii gate shape
+            ctx2d.beginPath();
+            ctx2d.moveTo(gsx - 12, gsy - 16);
+            ctx2d.lineTo(gsx + 12, gsy - 16); // top bar
+            ctx2d.moveTo(gsx - 10, gsy - 20);
+            ctx2d.lineTo(gsx + 10, gsy - 20); // upper bar
+            ctx2d.moveTo(gsx - 8, gsy - 20);
+            ctx2d.lineTo(gsx - 8, gsy); // left pillar
+            ctx2d.moveTo(gsx + 8, gsy - 20);
+            ctx2d.lineTo(gsx + 8, gsy); // right pillar
+            ctx2d.stroke();
+          }
+          // HP bar
+          if (gate.maxHp > 0) {
+            const gPct = gate.hp / gate.maxHp;
+            ctx2d.fillStyle = "#330011";
+            ctx2d.fillRect(gsx - 10, gsy + 2, 20, 3);
+            ctx2d.fillStyle = "#ff4466";
+            ctx2d.fillRect(gsx - 10, gsy + 2, 20 * gPct, 3);
+          }
+          ctx2d.restore();
+        }
+
+        // Kagura dance field
+        if (p.kaguraActive) {
+          ctx2d.save();
+          ctx2d.globalAlpha = 0.1 + 0.06 * Math.sin(GS.time * 3);
+          const kGrd = ctx2d.createRadialGradient(
+            sx,
+            sy,
+            0,
+            sx,
+            sy,
+            ABILITIES.kagura_dance.radius * WORLD_SCALE,
+          );
+          kGrd.addColorStop(0, "rgba(255,68,102,0.3)");
+          kGrd.addColorStop(1, "rgba(255,68,102,0)");
+          ctx2d.fillStyle = kGrd;
+          ctx2d.beginPath();
+          ctx2d.arc(
+            sx,
+            sy,
+            ABILITIES.kagura_dance.radius * WORLD_SCALE,
+            0,
+            Math.PI * 2,
+          );
+          ctx2d.fill();
+          // Sakura petals
+          for (let s = 0; s < 6; s++) {
+            const pa = GS.time * 1.2 + (s / 6) * Math.PI * 2;
+            const pr = ABILITIES.kagura_dance.radius * WORLD_SCALE * 0.6;
+            ctx2d.fillStyle = "#ffaacc";
+            ctx2d.beginPath();
+            ctx2d.arc(
+              sx + Math.cos(pa) * pr,
+              sy + Math.sin(pa) * pr,
+              3,
+              0,
+              Math.PI * 2,
+            );
+            ctx2d.fill();
+          }
+          ctx2d.restore();
+        }
+
+        // Spin ring (whirl)
+        if (p.abilities.includes("whirl")) {
           const [r, g, b] = p.cls.colorRGB;
           ctx2d.save();
           ctx2d.globalAlpha = 0.25 + 0.1 * Math.sin(GS.time * 6);
@@ -3076,9 +3322,7 @@
         const [r, g, b] = p.cls.colorRGB;
 
         // Slow aura radius ring (choir / kagura)
-        const hasSlow = p.abilities.some(
-          (a) => ABILITIES[a] && ABILITIES[a].type === "slow",
-        );
+        const hasSlow = p.abilities.includes("choir") || p.kaguraActive;
         if (hasSlow) {
           ctx2d.save();
           ctx2d.globalAlpha = 0.08 + 0.04 * Math.sin(GS.time * 1.5);
@@ -3093,34 +3337,103 @@
           ctx2d.restore();
         }
 
-        // Spirit fox companion
-        if (p.abilities.includes("spirit_fox")) {
-          const fa = GS.time * 1.8;
-          const fx = px + Math.cos(fa) * 2.2 * WORLD_SCALE;
-          const fy = py + Math.sin(fa) * 1.4 * WORLD_SCALE;
+        // Spirit fox companion (draw companion sprite if present)
+        if (p.abilities.includes("spirit_fox") && !p.foxDead) {
+          const fox = p.foxCompanion;
+          if (fox && fox.alive) {
+            const [fx, fy] = worldToScreen(fox.x, fox.y);
+            ctx2d.save();
+            const foxImg = SpriteCache["comp_fox"];
+            if (foxImg) {
+              const size = WORLD_SCALE * 1.2;
+              ctx2d.imageSmoothingEnabled = false;
+              ctx2d.drawImage(foxImg, fx - size / 2, fy - size / 2, size, size);
+            } else {
+              ctx2d.shadowColor = "#ff8844";
+              ctx2d.shadowBlur = 14;
+              ctx2d.fillStyle = "#ff8844";
+              ctx2d.beginPath();
+              ctx2d.arc(fx, fy, 8, 0, Math.PI * 2);
+              ctx2d.fill();
+              ctx2d.fillStyle = "#ffcc88";
+              ctx2d.beginPath();
+              ctx2d.arc(fx, fy, 4, 0, Math.PI * 2);
+              ctx2d.fill();
+            }
+            // HP bar above companion
+            if (fox.maxHp > 0) {
+              const pct = Math.max(0, fox.hp / fox.maxHp);
+              ctx2d.fillStyle = "#220000";
+              ctx2d.fillRect(fx - 12, fy - 22, 24, 4);
+              ctx2d.fillStyle = "#ff8844";
+              ctx2d.fillRect(fx - 12, fy - 22, 24 * pct, 4);
+            }
+            ctx2d.restore();
+          } else {
+            // Fallback: draw orb if companion not instantiated yet
+            const [fx, fy] = worldToScreen(p.foxX || p.x, p.foxY || p.y);
+            ctx2d.save();
+            ctx2d.shadowColor = "#ff8844";
+            ctx2d.shadowBlur = 14;
+            ctx2d.fillStyle = "#ff8844";
+            ctx2d.beginPath();
+            ctx2d.arc(fx, fy, 8, 0, Math.PI * 2);
+            ctx2d.fill();
+            ctx2d.fillStyle = "#ffcc88";
+            ctx2d.beginPath();
+            ctx2d.arc(fx, fy, 4, 0, Math.PI * 2);
+            ctx2d.fill();
+            ctx2d.restore();
+          }
+        }
+
+        // Melee slash VFX (sword sprite or arc) — short-lived swings
+        if (GS.meleeAttacks && GS.meleeAttacks.length) {
+          for (const m of GS.meleeAttacks) {
+            const [sx, sy] = worldToScreen(m.x, m.y);
+            ctx2d.save();
+            ctx2d.translate(sx, sy);
+            ctx2d.rotate(m.angle);
+            const swordImg = SpriteCache["sword"];
+            if (swordImg) {
+              const sw = WORLD_SCALE * (1.6 + (m.range || 4) * 0.05);
+              const sh = sw;
+              ctx2d.imageSmoothingEnabled = false;
+              ctx2d.drawImage(swordImg, -sw / 2, -sh / 2, sw, sh);
+            } else {
+              ctx2d.strokeStyle = "#aaffee";
+              ctx2d.lineWidth = 4;
+              ctx2d.globalAlpha = Math.max(0.12, m.life * 5);
+              ctx2d.beginPath();
+              ctx2d.arc(
+                0,
+                0,
+                (m.range || 4) * WORLD_SCALE,
+                -m.arc / 2,
+                m.arc / 2,
+              );
+              ctx2d.stroke();
+            }
+            ctx2d.restore();
+          }
+        }
+        // Avatar form aura (drawn in renderPlayer but also add outer glow here)
+        if (p.avatarInvincible) {
           ctx2d.save();
-          ctx2d.shadowColor = "#ff8844";
-          ctx2d.shadowBlur = 14;
-          ctx2d.fillStyle = "#ff8844";
-          // Fox silhouette: simple triangle + ears
+          ctx2d.globalAlpha = 0.12 + 0.08 * Math.sin(GS.time * 5);
+          const aGrd2 = ctx2d.createRadialGradient(
+            px,
+            py,
+            0,
+            px,
+            py,
+            3 * WORLD_SCALE,
+          );
+          aGrd2.addColorStop(0, "rgba(255,170,68,0.5)");
+          aGrd2.addColorStop(1, "rgba(255,170,68,0)");
+          ctx2d.fillStyle = aGrd2;
           ctx2d.beginPath();
-          ctx2d.arc(fx, fy, 8, 0, Math.PI * 2);
-          ctx2d.fill();
-          ctx2d.fillStyle = "#ffcc88";
-          ctx2d.beginPath();
-          ctx2d.arc(fx, fy, 4, 0, Math.PI * 2);
-          ctx2d.fill();
-          // Ear triangles
-          ctx2d.fillStyle = "#ff8844";
-          ctx2d.beginPath();
-          ctx2d.moveTo(fx - 6, fy - 6);
-          ctx2d.lineTo(fx - 3, fy - 13);
-          ctx2d.lineTo(fx - 1, fy - 6);
-          ctx2d.fill();
-          ctx2d.beginPath();
-          ctx2d.moveTo(fx + 6, fy - 6);
-          ctx2d.lineTo(fx + 3, fy - 13);
-          ctx2d.lineTo(fx + 1, fy - 6);
+          ctx2d.arc(px, py, 3 * WORLD_SCALE, 0, Math.PI * 2);
           ctx2d.fill();
           ctx2d.restore();
         }
@@ -3270,6 +3583,7 @@
           updateBots(dt);
           updateEnemies(dt);
           updateProjectiles(dt);
+          updateMeleeAttacks(dt);
           updateParticles(dt);
           updateXpOrbs(dt);
           updateAbilityEffects(dt);
@@ -3367,13 +3681,108 @@
         const moving = input.dx !== 0 || input.dy !== 0;
         p.bobPhase += dt * (moving ? 8 : 3);
 
-        // Healing from blessing ability
-        if (p.abilities.includes("blessing")) {
-          p.hp = Math.min(p.maxHp, p.hp + 3 * dt);
+        // Passive HP regen from stat
+        if ((p.hpRegen || 0) > 0) {
+          p.hp = Math.min(p.maxHp, p.hp + p.hpRegen * dt);
         }
 
-        // Speed buff from sufi_step
-        p.speed = p.cls.speed * (p.abilities.includes("sufi_step") ? 1.3 : 1);
+        // Meditation heal when standing still
+        if (p.abilities.includes("meditation")) {
+          const input2 = getInput();
+          if (input2.dx === 0 && input2.dy === 0) {
+            const medRank =
+              (p.abilityRanks && p.abilityRanks["meditation"]) || 1;
+            const medHeal =
+              ABILITIES.meditation.healPerSec * (1 + 0.4 * (medRank - 1));
+            p.hp = Math.min(p.maxHp, p.hp + medHeal * dt);
+          }
+        }
+
+        // Avatar invincibility timer
+        if (p.avatarInvincible && p.avatarTimer) {
+          p.avatarTimer -= dt;
+          if (p.avatarTimer <= 0) p.avatarInvincible = false;
+        }
+
+        // Blessing buff timer
+        if (p.blessingActive) {
+          p.blessingTimer -= dt;
+          if (p.blessingTimer <= 0) {
+            p.blessingActive = false;
+            p.blessingDamageBuff = 0;
+          } else {
+            const bRank = (p.abilityRanks && p.abilityRanks["blessing"]) || 1;
+            const healOT =
+              ABILITIES.blessing.healPerSec * (1 + 0.3 * (bRank - 1));
+            p.hp = Math.min(p.maxHp, p.hp + healOT * dt);
+          }
+        }
+
+        // Kagura dance timer
+        if (p.kaguraActive) {
+          p.kaguraTimer -= dt;
+          if (p.kaguraTimer <= 0) p.kaguraActive = false;
+        }
+
+        // Shield recharge: if shield was broken (shieldHp=0, maxShieldHp>0) count CD
+        if (p.shieldActive && p.shieldHp <= 0) {
+          p.shieldActive = false;
+        }
+
+        // Shrine Maiden: fox companion spawn / respawn
+        if (p.abilities.includes("spirit_fox")) {
+          if (p.foxDead) {
+            p.foxRespawnTimer = (p.foxRespawnTimer || 0) - dt;
+            if (p.foxRespawnTimer <= 0) {
+              p.foxDead = false;
+              // spawn companion entity
+              p.foxCompanion = {
+                x: p.x + 2,
+                y: p.y,
+                hp: 30,
+                maxHp: 30,
+                alive: true,
+                attackTimer: 0,
+                attackCd: 0.9,
+                speed: 3,
+                range: 1.0,
+              };
+            }
+          } else {
+            // ensure companion exists
+            if (!p.foxCompanion) {
+              p.foxCompanion = {
+                x: p.x + 2,
+                y: p.y,
+                hp: 30,
+                maxHp: 30,
+                alive: true,
+                attackTimer: 0,
+                attackCd: 0.9,
+                speed: 3,
+                range: 1.0,
+              };
+            }
+            // Orbit placement when idle
+            const fa = GS.time * 1.8;
+            const ox = p.x + Math.cos(fa) * 2.2;
+            const oy = p.y + Math.sin(fa) * 1.4;
+            p.foxCompanion.x += (ox - p.foxCompanion.x) * Math.min(1, dt * 6);
+            p.foxCompanion.y += (oy - p.foxCompanion.y) * Math.min(1, dt * 6);
+            // keep legacy foxX/Y in sync for other code paths
+            p.foxX = p.foxCompanion.x;
+            p.foxY = p.foxCompanion.y;
+          }
+        }
+
+        // Samsara mirror position (slightly behind/offset)
+        if (p.abilities.includes("samsara")) {
+          p.samsaraX = p.x - p.facing.x * 0.8 + Math.sin(GS.time * 0.5) * 0.3;
+          p.samsaraY = p.y - p.facing.y * 0.8 + Math.cos(GS.time * 0.5) * 0.3;
+        }
+
+        // Speed from sufi_step: handled as an active restraint; base speed
+        p.speed = p.cls.speed;
 
         // Tick orbit angle for visual effects
         p.orbitAngle += dt * 2;
@@ -3387,24 +3796,80 @@
           const ex = e.x - p.x,
             ey = e.y - p.y;
           if (ex * ex + ey * ey < 0.6) {
+            // Evasion check
+            if ((p.evasion || 0) > 0 && Math.random() < p.evasion) continue;
             let dmg = e.dmg * dt;
-            if (p.shieldActive) dmg = 0;
-            if (p.abilities.includes("meditation")) dmg *= 0.8;
+            if (p.avatarInvincible) dmg = 0;
+            if (p.shieldActive && p.shieldHp > 0) {
+              // harae_aura: torii/fox absorb portion
+              if (p.abilities.includes("harae_aura")) {
+                const absRank =
+                  (p.abilityRanks && p.abilityRanks["harae_aura"]) || 1;
+                const absorbPct = Math.min(
+                  0.75,
+                  ABILITIES.harae_aura.absorbPct + 0.1 * (absRank - 1),
+                );
+                dmg *= 1 - absorbPct;
+              }
+              const actualShieldDmg = Math.min(p.shieldHp, dmg * e.dmg);
+              p.shieldHp -= actualShieldDmg;
+              dmg = Math.max(0, dmg - actualShieldDmg / e.dmg);
+              if (p.shieldHp <= 0) {
+                p.shieldActive = false;
+                p.shieldHp = 0;
+              }
+            }
+            if (p.abilities.includes("diamond_mind")) {
+              const dmRank =
+                (p.abilityRanks && p.abilityRanks["diamond_mind"]) || 1;
+              const deflect =
+                ABILITIES.diamond_mind.deflectChance + 0.08 * (dmRank - 1);
+              if (Math.random() < deflect) continue;
+            }
             takeDamage(p, dmg);
           }
         }
 
-        // Tick ability cooldowns
-        for (const ab of p.abilities) {
-          if ((p.abilityCooldowns[ab] || 0) > 0) p.abilityCooldowns[ab] -= dt;
-        }
+        // Innate cooldown tick
+        // (Milestone ability CDs ticked in updateAbilityEffects)
       }
 
       function takeDamage(player, amt) {
         if (player.dead || amt <= 0) return;
-        // apply damage reduction from defense stat (percentage)
+        if (player.avatarInvincible) return;
         const reduction = player.defense || 0;
-        const finalAmt = Math.max(0, amt * (1 - reduction));
+        let finalAmt = Math.max(0, amt * (1 - reduction));
+        // Blessing damage buff doesn't affect taking damage, only dealing
+        // Shield absorption
+        if (player.shieldActive && player.shieldHp > 0) {
+          const absorbed = Math.min(player.shieldHp, finalAmt);
+          player.shieldHp -= absorbed;
+          finalAmt -= absorbed;
+          if (player.shieldHp <= 0) {
+            player.shieldActive = false;
+            player.shieldHp = 0;
+            // Start recharge CD for sacred_barrier
+            if (
+              player.abilities &&
+              player.abilities.includes("sacred_barrier")
+            ) {
+              const sbRank =
+                (player.abilityRanks &&
+                  player.abilityRanks["sacred_barrier"]) ||
+                1;
+              player.abilityCooldowns["sacred_barrier"] = Math.max(
+                4,
+                ABILITIES.sacred_barrier.cd *
+                  (1 - (player.cooldownReduction || 0)) -
+                  2 * (sbRank - 1),
+              );
+            }
+          }
+          if (finalAmt <= 0) {
+            player.hitFlash = 0.08;
+            return;
+          }
+        }
         player.hp -= finalAmt;
         player.hitFlash = 0.12;
         if (player.hp <= 0) {
@@ -3476,16 +3941,64 @@
           py = p ? p.y : 0;
         for (const e of GS.enemies) {
           if (!e.alive) continue;
+          // Paralysis
+          if ((e.paralyzed || 0) > 0) {
+            e.paralyzed -= dt;
+            if (e.hitFlash > 0) e.hitFlash -= dt;
+            continue;
+          }
+          // Restraint (sufi_step cloth)
+          if ((e.restrained || 0) > 0) {
+            e.restrained -= dt;
+            if (e.hitFlash > 0) e.hitFlash -= dt;
+            continue;
+          }
+          // Charmed: attack nearest other enemy
+          if ((e.charmed || 0) > 0) {
+            e.charmed -= dt;
+            let nearEnemy = null,
+              nearD = 999;
+            for (const e2 of GS.enemies) {
+              if (!e2.alive || e2 === e) continue;
+              const d2 = (e2.x - e.x) ** 2 + (e2.y - e.y) ** 2;
+              if (d2 < nearD) {
+                nearD = d2;
+                nearEnemy = e2;
+              }
+            }
+            if (nearEnemy) {
+              const cdx = nearEnemy.x - e.x,
+                cdy = nearEnemy.y - e.y;
+              const cd = Math.sqrt(cdx * cdx + cdy * cdy) || 1;
+              e.x += (cdx / cd) * e.speed * dt;
+              e.y += (cdy / cd) * e.speed * dt;
+              if (nearD < 0.6) hitEnemy(nearEnemy, e.dmg * dt, true);
+            }
+            if (e.hitFlash > 0) e.hitFlash -= dt;
+            if (e.wobbleAmt > 0) e.wobbleAmt *= 0.85;
+            continue;
+          }
           let tx = px,
             ty = py;
           let bestDist = (e.x - px) ** 2 + (e.y - py) ** 2;
           for (const b of GS.botPlayers) {
             if (b.dead) continue;
-            const d = (e.x - b.x) ** 2 + (e.y - b.y) ** 2;
-            if (d < bestDist) {
-              bestDist = d;
+            const d2 = (e.x - b.x) ** 2 + (e.y - b.y) ** 2;
+            if (d2 < bestDist) {
+              bestDist = d2;
               tx = b.x;
               ty = b.y;
+            }
+          }
+          // Consider player's fox companion as a potential target
+          if (p && p.foxCompanion && p.foxCompanion.alive) {
+            const fx = p.foxCompanion.x,
+              fy = p.foxCompanion.y;
+            const d2f = (e.x - fx) ** 2 + (e.y - fy) ** 2;
+            if (d2f < bestDist) {
+              bestDist = d2f;
+              tx = fx;
+              ty = fy;
             }
           }
           const dx = tx - e.x,
@@ -3493,6 +4006,24 @@
           const d = Math.sqrt(dx * dx + dy * dy) || 1;
           e.x += (dx / d) * e.speed * dt;
           e.y += (dy / d) * e.speed * dt;
+          // If near the player's fox companion, damage it
+          if (p && p.foxCompanion && p.foxCompanion.alive) {
+            const fx = p.foxCompanion.x,
+              fy = p.foxCompanion.y;
+            const ex2 = e.x - fx,
+              ey2 = e.y - fy;
+            if (ex2 * ex2 + ey2 * ey2 < 0.8) {
+              p.foxCompanion.hp -= e.dmg * dt;
+              if (p.foxCompanion.hp <= 0) {
+                p.foxCompanion.hp = 0;
+                p.foxCompanion.alive = false;
+                p.foxDead = true;
+                p.foxRespawnTimer = 7; // seconds until respawn
+                addFloatText(p.x, p.y, "FOX DOWN!", "#ff8844");
+                spawnParticles(fx, fy, "#ff8844", 10);
+              }
+            }
+          }
           if (e.hitFlash > 0) e.hitFlash -= dt;
           if (e.wobbleAmt > 0) e.wobbleAmt *= 0.85;
         }
@@ -3511,11 +4042,19 @@
               // scale projectile damage if it belongs to the player (apply damageMult and per-ability rank)
               let actualDamage = proj.damage;
               if (proj.owner === "player" && GS.player) {
-                actualDamage *= GS.player.damageMult || 1;
+                const pp = GS.player;
+                actualDamage *= pp.damageMult || 1;
+                if (pp.blessingActive && pp.blessingDamageBuff)
+                  actualDamage *= 1 + pp.blessingDamageBuff;
                 if (proj.sourceAbility) {
-                  const rank = GS.player.abilityRanks[proj.sourceAbility] || 1;
-                  actualDamage *= 1 + 0.25 * (rank - 1);
+                  const rank =
+                    (pp.abilityRanks && pp.abilityRanks[proj.sourceAbility]) ||
+                    1;
+                  actualDamage *= 1 + 0.2 * (rank - 1);
                 }
+                // Crit
+                if (Math.random() < (pp.critChance || 0.05))
+                  actualDamage *= pp.critMult || 1.5;
               }
               hitEnemy(e, actualDamage);
               spawnParticles(e.x, e.y, proj.color || "#ffffff", 5);
@@ -3574,26 +4113,85 @@
 
       function gainXP(player, amount) {
         player.xp += amount;
-        // handle potential multiple level-ups from a large XP gain
         while (player.xp >= player.xpNeeded) {
           player.xp -= player.xpNeeded;
           player.xpNeeded = Math.floor(player.xpNeeded * 1.4);
           player.level++;
-          const isAbilityLevel = player.level % 5 === 0;
-          GS.levelUpQueue.push({
-            type: isAbilityLevel ? "ability" : "stat",
-            level: player.level,
-          });
+          const lvl = player.level;
+          // Every 5 levels: innate scales automatically (no choice) + milestone ability choice
+          // Every non-5-multiple level: stat choice
+          if (lvl % 5 === 0) {
+            // Auto-scale innate (silent)
+            const innateId = player.cls && player.cls.innateAbility;
+            if (innateId) {
+              player.abilityRanks[innateId] =
+                (player.abilityRanks[innateId] || 1) + 1;
+            }
+            addFloatText(
+              player.x,
+              player.y - 1.5,
+              "INNATE UPGRADED!",
+              "#ffffaa",
+            );
+            // Also give a milestone ability choice
+            GS.levelUpQueue.push({ type: "ability", level: lvl });
+          } else {
+            GS.levelUpQueue.push({ type: "stat", level: lvl });
+          }
         }
-        // start processing queue (if not currently showing a modal)
         processLevelUpQueue();
       }
 
-      function hitEnemy(enemy, damage) {
+      function hitEnemy(enemy, damage, skipMark) {
         if (!enemy.alive) return;
+        // Accuracy check against enemy evasion (later waves enemies get more dodge)
+        const p2 = GS.player;
+        if (p2 && !skipMark) {
+          const baseEvasion = (GS.wave - 1) * 0.008;
+          const eff_acc = p2.accuracy || 1.0;
+          if (
+            baseEvasion > 0 &&
+            Math.random() < Math.max(0, baseEvasion - (eff_acc - 1.0) * 0.5)
+          )
+            return;
+          // Armor weakened
+          if (p2.armoredWeakened) {
+            const id = GS.enemies.indexOf(enemy);
+            const aw = p2.armoredWeakened.get(id);
+            if (aw) damage *= 1 + aw.reduce;
+          }
+          // Divine geometry mark
+          if (
+            p2.abilities &&
+            p2.abilities.includes("divine_geometry") &&
+            p2.markedEnemies
+          ) {
+            const dgRank =
+              (p2.abilityRanks && p2.abilityRanks[divine_geometry]) || 1;
+            const id2 = GS.enemies.indexOf(enemy);
+            const marks = p2.markedEnemies.get(id2) || 0;
+            if (marks > 0)
+              damage *=
+                1 +
+                ABILITIES.divine_geometry.markDmgBonus *
+                  (1 + 0.2 * (dgRank - 1)) *
+                  marks;
+            p2.markedEnemies.set(id2, Math.min(marks + 1, 5));
+          }
+          // Sufi step lifesteal
+          if (
+            enemy.lifeStealOnHit &&
+            p2.abilities &&
+            p2.abilities.includes("sufi_step")
+          ) {
+            const heal = damage * 0.15;
+            p2.hp = Math.min(p2.maxHp, p2.hp + heal);
+            enemy.lifeStealOnHit = false;
+          }
+        }
         enemy.hp -= damage;
         enemy.hitFlash = 0.12;
-        enemy.wobbleAmt = 1.0; // triggers wobble animation
+        enemy.wobbleAmt = 1.0;
         addFloatText(enemy.x, enemy.y, "-" + Math.round(damage), "#ffdd44");
         if (enemy.hp <= 0) {
           enemy.alive = false;
@@ -3715,134 +4313,366 @@
         return best;
       }
 
+      // ─── COMBAT HELPERS ────────────────────────────────────────────────────────
+      function applyCrit(player, damage) {
+        const chance = player ? player.critChance || 0.05 : 0.05;
+        const mult = player ? player.critMult || 1.5 : 1.5;
+        if (Math.random() < chance) {
+          addFloatText(player.x, player.y - 0.5, "CRIT!", "#ffdd00");
+          return damage * mult;
+        }
+        return damage;
+      }
+
+      // Apply burn to an enemy (stores in player.burnedEnemies)
+      function applyBurn(player, enemy, dps, duration) {
+        if (!player || !enemy) return;
+        const id = GS.enemies.indexOf(enemy);
+        if (id < 0) return;
+        const existing = player.burnedEnemies.get(id);
+        if (!existing || existing.timer < duration) {
+          player.burnedEnemies.set(id, { dps, timer: duration });
+        }
+      }
+
+      function updateBurnEffects(dt) {
+        const p = GS.player;
+        if (!p || p.dead) return;
+        for (const [id, burn] of p.burnedEnemies) {
+          burn.timer -= dt;
+          if (burn.timer <= 0) {
+            p.burnedEnemies.delete(id);
+            continue;
+          }
+          const e = GS.enemies[id];
+          if (!e || !e.alive) {
+            p.burnedEnemies.delete(id);
+            continue;
+          }
+          hitEnemy(e, burn.dps * dt * (p.damageMult || 1));
+        }
+        // Armor weakened
+        for (const [id, aw] of p.armoredWeakened) {
+          aw.timer -= dt;
+          if (aw.timer <= 0) {
+            p.armoredWeakened.delete(id);
+          }
+        }
+      }
+
       function updateAbilityEffects(dt) {
         const p = GS.player;
         if (!p || p.dead) return;
 
-        // Aura damage (holy_light, purify_aura)
-        for (const ab of p.abilities) {
-          const def = ABILITIES[ab];
-          if (!def || def.type !== "aura") continue;
-          for (const e of GS.enemies) {
-            if (!e.alive) continue;
-            if ((e.x - p.x) ** 2 + (e.y - p.y) ** 2 < def.radius ** 2) {
-              const mult = getPlayerAbilityMultiplier(ab);
-              hitEnemy(e, def.damage * dt * mult);
+        updateBurnEffects(dt);
+
+        // ── INNATE ABILITIES (scale with level) ──────────────────────────────
+        p.innateTimer = (p.innateTimer || 0) - dt;
+        const clsId = p.cls.id;
+        const iRank =
+          (p.abilityRanks && p.abilityRanks[clsId + "_innate"]) || 1;
+        const lvl = p.level || 1;
+        const shootMult = p.shootSpeed || 1.0;
+
+        // ── INNATE: SMITE (Priest) ────────────────────────────────────────────
+        if (clsId === "priest" && p.innateTimer <= 0) {
+          const near = getNearestEnemy(p.x, p.y, 15);
+          if (near) {
+            const baseDmg = ABILITIES.smite.damage * (p.damageMult || 1);
+            // Radius grows at lvl 5, 15, ...
+            let radius = 2.0 + 0.4 * Math.floor(lvl / 5);
+            // Cross effect at lvl 10+
+            const hasCross = lvl >= 10;
+            const baseDmgFinal = applyCrit(p, baseDmg);
+            blastRadius(near.x, near.y, radius, baseDmgFinal);
+            spawnParticles(near.x, near.y, "#ffff44", 10);
+            addWaveEffect(near.x, near.y, radius, "#ffff44");
+            if (hasCross) {
+              const crossDmgMult = lvl >= 20 ? 1.4 : 1.0;
+              const crossRange = radius * 1.5;
+              const dirs = [
+                { dx: 1, dy: 0 },
+                { dx: -1, dy: 0 },
+                { dx: 0, dy: 1 },
+                { dx: 0, dy: -1 },
+              ];
+              for (const d of dirs) {
+                for (let step = 0.5; step <= crossRange; step += 0.5) {
+                  const cx = near.x + d.dx * step,
+                    cy = near.y + d.dy * step;
+                  for (const e of GS.enemies) {
+                    if (!e.alive) continue;
+                    if ((e.x - cx) ** 2 + (e.y - cy) ** 2 < 0.6) {
+                      hitEnemy(e, baseDmgFinal * 0.5 * crossDmgMult);
+                    }
+                  }
+                }
+              }
+              // Lightning effect
+              spawnParticles(near.x, near.y, "#aaccff", 8);
             }
           }
+          const baseCd = ABILITIES.smite.cd / shootMult;
+          p.innateTimer = Math.max(
+            0.4,
+            baseCd * (1 - (p.cooldownReduction || 0)),
+          );
         }
 
-        // Spin damage (kesa_spin, whirl)
-        if (
-          p.abilities.includes("kesa_spin") ||
-          p.abilities.includes("whirl")
-        ) {
-          const abId = p.abilities.includes("whirl") ? "whirl" : "kesa_spin";
-          const def = ABILITIES[abId];
-          const mult = getPlayerAbilityMultiplier(abId);
-          for (const e of GS.enemies) {
-            if (!e.alive) continue;
-            if ((e.x - p.x) ** 2 + (e.y - p.y) ** 2 < 3)
-              hitEnemy(e, def.damage * dt * 0.5 * mult);
+        // ── INNATE: LOTUS STRIKE (Monk) ───────────────────────────────────────
+        if (clsId === "monk" && p.innateTimer <= 0) {
+          const baseDmg = ABILITIES.lotus_strike.damage * (p.damageMult || 1);
+          // Base 6 projectiles, +2 at lvl 5, +2 at lvl 15
+          let projCount = 6;
+          if (lvl >= 5) projCount += 2;
+          if (lvl >= 15) projCount += 2;
+          if (lvl >= 25) projCount += 2;
+          const paralyze = lvl >= 10;
+          const paralyzeDur = lvl >= 20 ? 1.5 : 0.8;
+          for (let a = 0; a < projCount; a++) {
+            const ang = (a / projCount) * Math.PI * 2;
+            const dmg = applyCrit(p, baseDmg);
+            fireProjectile(
+              p.x,
+              p.y,
+              Math.cos(ang) * 9,
+              Math.sin(ang) * 9,
+              dmg,
+              "#ffaacc",
+              "player",
+              undefined,
+              "lotus_strike_innate",
+            );
           }
-        }
-
-        // Slow aura
-        const hasSlow = p.abilities.some(
-          (a) => ABILITIES[a] && ABILITIES[a].type === "slow",
-        );
-        if (hasSlow) {
-          for (const e of GS.enemies) {
-            if (!e.alive) continue;
-            const d2 = (e.x - p.x) ** 2 + (e.y - p.y) ** 2;
-            e.speed =
-              e.type.spd * (1 + (GS.wave - 1) * 0.08) * (d2 < 16 ? 0.6 : 1);
+          if (paralyze) {
+            // mark nearby enemies as paralyzed briefly
+            for (const e of GS.enemies) {
+              if (!e.alive) continue;
+              if ((e.x - p.x) ** 2 + (e.y - p.y) ** 2 < 4) {
+                e.paralyzed = (e.paralyzed || 0) + paralyzeDur;
+              }
+            }
           }
+          const baseCd = ABILITIES.lotus_strike.cd / shootMult;
+          p.innateTimer = Math.max(
+            0.3,
+            baseCd * (1 - (p.cooldownReduction || 0)),
+          );
         }
 
-        // Auto-fire abilities
-        if (p.abilities.includes("chakra_beam") && GS.frameCount % 20 === 0) {
-          const near = getNearestEnemy(p.x, p.y);
+        // ── INNATE: CRESCENT SLASH (Dervish) ──────────────────────────────────
+        if (clsId === "dervish" && p.innateTimer <= 0) {
+          const near = getNearestEnemy(p.x, p.y, 12);
           if (near) {
             const dx = near.x - p.x,
               dy = near.y - p.y;
             const d = Math.sqrt(dx * dx + dy * dy) || 1;
+            const baseAngle = Math.atan2(dy, dx);
+            // Arc width grows at lvl 5, range grows at lvl 5
+            let arcSpread = 0.4 + 0.15 * Math.floor(lvl / 5);
+            let range = 5 + 0.8 * Math.floor(lvl / 5);
+            const hasLifesteal = lvl >= 10;
+            const lifeStealPct = 0.08 + 0.04 * Math.floor(lvl / 10);
+            // Create a short-lived melee slash arc in front of the player
+            const baseDmg =
+              ABILITIES.crescent_slash.damage * (p.damageMult || 1);
+            GS.meleeAttacks.push({
+              x: p.x,
+              y: p.y,
+              angle: baseAngle,
+              arc: arcSpread * 2,
+              range: range,
+              life: 0.18,
+              damage: baseDmg,
+              owner: "player",
+              color: "#aaffee",
+              sourceAbility: "crescent_slash",
+              hasLifesteal: hasLifesteal,
+              lifeStealPct: lifeStealPct,
+            });
+            spawnParticles(
+              p.x + Math.cos(baseAngle) * (range * 0.4),
+              p.y + Math.sin(baseAngle) * (range * 0.4),
+              "#aaffee",
+              12,
+            );
+          }
+          const baseCd = ABILITIES.crescent_slash.cd / shootMult;
+          p.innateTimer = Math.max(
+            0.3,
+            baseCd * (1 - (p.cooldownReduction || 0)),
+          );
+        }
+
+        // ── INNATE: CHAKRA BEAM (Yogi) ────────────────────────────────────────
+        if (clsId === "yogi" && p.innateTimer <= 0) {
+          const near = getNearestEnemy(p.x, p.y, 14);
+          if (near) {
+            const dx = near.x - p.x,
+              dy = near.y - p.y;
+            const d = Math.sqrt(dx * dx + dy * dy) || 1;
+            const hasBurn = lvl >= 5;
+            let burnDps = 4 + 2 * Math.floor(lvl / 5);
+            // Beam size grows at lvl 10+
+            const beamLife = lvl >= 10 ? 3.5 : 2.5;
+            const dmg = applyCrit(
+              p,
+              ABILITIES.chakra_beam.damage * (p.damageMult || 1),
+            );
             fireProjectile(
               p.x,
               p.y,
-              (dx / d) * 8,
-              (dy / d) * 8,
-              ABILITIES.chakra_beam.damage,
+              (dx / d) * 9,
+              (dy / d) * 9,
+              dmg,
               "#ff88cc",
               "player",
               "beam",
-              "chakra_beam",
+              "chakra_beam_innate",
             );
+            if (hasBurn) {
+              // Apply burn to all enemies along beam path
+              for (const e of GS.enemies) {
+                if (!e.alive) continue;
+                const ex = e.x - p.x,
+                  ey = e.y - p.y;
+                // Check if enemy is roughly along beam direction
+                const dot = ex * (dx / d) + ey * (dy / d);
+                if (dot > 0 && dot < 12) {
+                  const cross = Math.abs(ex * (dy / d) - ey * (dx / d));
+                  if (cross < 0.8) applyBurn(p, e, burnDps, 2);
+                }
+              }
+            }
           }
+          const baseCd = ABILITIES.chakra_beam.cd / shootMult;
+          p.innateTimer = Math.max(
+            0.2,
+            baseCd * (1 - (p.cooldownReduction || 0)),
+          );
         }
-        if (
-          p.abilities.includes("ofuda") &&
-          (p.abilityCooldowns.ofuda || 0) <= 0
-        ) {
-          const near = getNearestEnemy(p.x, p.y);
+
+        // ── INNATE: OFUDA (Shrine Maiden) ─────────────────────────────────────
+        if (clsId === "shrine_maiden" && p.innateTimer <= 0) {
+          const near = getNearestEnemy(p.x, p.y, 13);
           if (near) {
             const dx = near.x - p.x,
               dy = near.y - p.y;
             const baseAngle = Math.atan2(dy, dx);
-            const rank = (p.abilityRanks && p.abilityRanks.ofuda) || 1;
-            const shots = 1 + (rank - 1); // +1 projectile per extra rank
-            const spread = 0.25; // radians between projectiles
+            // Shots grow at lvl 5, 20; cone grows at lvl 10, 25
+            let shots = 3;
+            if (lvl >= 5) shots += 2;
+            if (lvl >= 20) shots += 2;
+            let coneSpread = 0.3;
+            if (lvl >= 10) coneSpread += 0.15;
+            if (lvl >= 25) coneSpread += 0.15;
+            const hasCharm = lvl >= 15;
+            const charmChance = 0.08 + 0.04 * Math.floor((lvl - 15) / 15);
             for (let i = 0; i < shots; i++) {
-              const angle = baseAngle + (i - (shots - 1) / 2) * spread;
-              const vx = Math.cos(angle) * 10,
-                vy = Math.sin(angle) * 10;
+              const ang = baseAngle + (i / (shots - 1) - 0.5) * coneSpread * 2;
+              const dmg = applyCrit(
+                p,
+                ABILITIES.ofuda.damage * (p.damageMult || 1),
+              );
               fireProjectile(
                 p.x,
                 p.y,
-                vx,
-                vy,
-                ABILITIES.ofuda.damage,
+                Math.cos(ang) * 10,
+                Math.sin(ang) * 10,
+                dmg,
                 "#ff4466",
                 "player",
                 undefined,
-                "ofuda",
+                "ofuda_innate",
               );
+              // Charm: mark closest enemy for charm
+              if (hasCharm && Math.random() < charmChance) {
+                const hit = getNearestEnemy(
+                  p.x + Math.cos(ang) * 3,
+                  p.y + Math.sin(ang) * 3,
+                  2,
+                );
+                if (hit) hit.charmed = (hit.charmed || 0) + 3;
+              }
             }
-            p.abilityCooldowns.ofuda = Math.max(
-              0,
-              ABILITIES.ofuda.cd * (1 - (p.cooldownReduction || 0)),
-            );
+          }
+          const baseCd = ABILITIES.ofuda.cd / shootMult;
+          p.innateTimer = Math.max(
+            0.2,
+            baseCd * (1 - (p.cooldownReduction || 0)),
+          );
+        }
+
+        // ── SLOW AURA (choir / kagura_dance) ────────────────────────────────
+        const hasChoir = p.abilities.includes("choir");
+        const hasKagura = p.kaguraActive;
+        if (hasChoir || hasKagura) {
+          for (const e of GS.enemies) {
+            if (!e.alive) continue;
+            const d2 = (e.x - p.x) ** 2 + (e.y - p.y) ** 2;
+            const chRadius = hasChoir ? ABILITIES.choir.radius ** 2 : 0;
+            const kRadius = hasKagura ? ABILITIES.kagura_dance.radius ** 2 : 0;
+            const inRange = d2 < Math.max(chRadius, kRadius);
+            if (inRange) {
+              let slowAmt = 0;
+              if (hasChoir) {
+                const cRank = (p.abilityRanks && p.abilityRanks["choir"]) || 1;
+                slowAmt = Math.max(
+                  slowAmt,
+                  ABILITIES.choir.slowAmt + 0.05 * (cRank - 1),
+                );
+              }
+              if (hasKagura && d2 < kRadius) {
+                const kRank =
+                  (p.abilityRanks && p.abilityRanks["kagura_dance"]) || 1;
+                slowAmt = Math.max(
+                  slowAmt,
+                  ABILITIES.kagura_dance.slowAmt + 0.05 * (kRank - 1),
+                );
+                p.hp = Math.min(
+                  p.maxHp,
+                  p.hp + ABILITIES.kagura_dance.healPerSec * dt,
+                );
+              }
+              e.speed = e.type.spd * (1 + (GS.wave - 1) * 0.08) * (1 - slowAmt);
+            }
           }
         }
 
-        // Fire mandala orbit damage
-        if (p.abilities.includes("fire_mandala") && GS.frameCount % 25 === 0) {
-          for (let a = 0; a < 6; a++) {
-            const ang = p.orbitAngle + a * ((Math.PI * 2) / 6);
+        // ── FIRE MANDALA (Yogi passive) ───────────────────────────────────────
+        if (p.abilities.includes("fire_mandala") && GS.frameCount % 20 === 0) {
+          const fmRank =
+            (p.abilityRanks && p.abilityRanks["fire_mandala"]) || 1;
+          const ringCount = 6;
+          for (let a = 0; a < ringCount; a++) {
+            const ang = p.orbitAngle * 1.5 + a * ((Math.PI * 2) / ringCount);
             const cx = p.x + Math.cos(ang) * 2,
               cy = p.y + Math.sin(ang) * 2;
             for (const e of GS.enemies) {
               if (!e.alive) continue;
-              if ((e.x - cx) ** 2 + (e.y - cy) ** 2 < 0.6)
-                hitEnemy(
-                  e,
+              if ((e.x - cx) ** 2 + (e.y - cy) ** 2 < 0.7) {
+                const dmg =
                   ABILITIES.fire_mandala.damage *
-                    dt *
-                    3 *
-                    getPlayerAbilityMultiplier("fire_mandala"),
+                  dt *
+                  3 *
+                  (p.damageMult || 1) *
+                  (1 + 0.25 * (fmRank - 1));
+                hitEnemy(e, applyCrit(p, dmg));
+                applyBurn(
+                  p,
+                  e,
+                  ABILITIES.fire_mandala.burnDps * (1 + 0.2 * (fmRank - 1)),
+                  ABILITIES.fire_mandala.burnDur,
                 );
+              }
             }
           }
         }
 
-        // Orbit (resurrection_bell / lotus_barrier) damage
-        if (
-          p.abilities.includes("resurrection_bell") ||
-          p.abilities.includes("lotus_barrier")
-        ) {
-          const orbAb = p.abilities.includes("resurrection_bell")
-            ? "resurrection_bell"
-            : "lotus_barrier";
+        // ── RESURRECTION BELL (Priest) – orbit + near-death ──────────────────
+        if (p.abilities.includes("resurrection_bell")) {
+          const rbRank =
+            (p.abilityRanks && p.abilityRanks["resurrection_bell"]) || 1;
           for (let a = 0; a < 3; a++) {
             const ang = p.orbitAngle + a * ((Math.PI * 2) / 3);
             const cx = p.x + Math.cos(ang) * 2,
@@ -3852,191 +4682,453 @@
               if ((e.x - cx) ** 2 + (e.y - cy) ** 2 < 0.5)
                 hitEnemy(
                   e,
-                  ABILITIES[orbAb].damage *
+                  ABILITIES.resurrection_bell.damage *
                     dt *
                     2 *
-                    getPlayerAbilityMultiplier(orbAb),
+                    (p.damageMult || 1) *
+                    (1 + 0.3 * (rbRank - 1)),
                 );
+            }
+          }
+          // Near-death resurrection
+          if (!p.resurrectionUsed && p.hp / p.maxHp <= 0.1 && p.hp > 0) {
+            const healPct =
+              ABILITIES.resurrection_bell.healPct + 0.1 * (rbRank - 1);
+            p.hp = p.maxHp * Math.min(0.9, healPct);
+            p.resurrectionUsed = true;
+            addFloatText(p.x, p.y, "RESURRECTION!", "#ffff44");
+            addWaveEffect(p.x, p.y, 3, "#ffff44");
+          }
+        }
+
+        // ── LOTUS BARRIER (Yogi) – low-hp shield ────────────────────────────
+        if (p.abilities.includes("lotus_barrier")) {
+          const lbRank =
+            (p.abilityRanks && p.abilityRanks["lotus_barrier"]) || 1;
+          if (
+            p.hp / p.maxHp <= ABILITIES.lotus_barrier.threshold &&
+            !p.shieldActive
+          ) {
+            if ((p.abilityCooldowns["lotus_barrier"] || 0) <= 0) {
+              p.shieldActive = true;
+              p.shieldHp =
+                ABILITIES.lotus_barrier.shieldAmt * (1 + 0.3 * (lbRank - 1));
+              p.maxShieldHp = p.shieldHp;
+              p.abilityCooldowns["lotus_barrier"] =
+                ABILITIES.lotus_barrier.cd * (1 - (p.cooldownReduction || 0));
+              addFloatText(p.x, p.y, "LOTUS SHIELD!", "#ff88cc");
             }
           }
         }
 
-        // Spirit fox attack
-        if (p.abilities.includes("spirit_fox") && GS.frameCount % 30 === 0) {
-          const near = getNearestEnemy(p.x, p.y, 8);
-          if (near)
-            hitEnemy(
-              near,
-              ABILITIES.spirit_fox.damage *
-                getPlayerAbilityMultiplier("spirit_fox"),
-            );
-        }
-
-        // Shield on low HP (basmala_shield)
-        if (
-          p.abilities.includes("basmala_shield") &&
-          p.hp / p.maxHp < 0.3 &&
-          !p.shieldActive
-        ) {
-          if ((p.abilityCooldowns.basmala_shield || 0) <= 0) {
-            p.shieldActive = true;
-            p.abilityCooldowns.basmala_shield = ABILITIES.basmala_shield.cd;
-            setTimeout(() => (p.shieldActive = false), 4000);
+        // ── SPIRIT FOX (Shrine Maiden) — companion AI & attacks
+        if (p.abilities.includes("spirit_fox") && !p.foxDead) {
+          const fox = p.foxCompanion;
+          if (fox && fox.alive) {
+            fox.attackTimer = (fox.attackTimer || 0) - dt;
+            const sfRank =
+              (p.abilityRanks && p.abilityRanks["spirit_fox"]) || 1;
+            const omRank = p.abilities.includes("omamori_charm")
+              ? (p.abilityRanks && p.abilityRanks["omamori_charm"]) || 1
+              : 0;
+            const omBuff =
+              omRank > 0
+                ? ABILITIES.omamori_charm.dmgBuff * (1 + 0.2 * (omRank - 1))
+                : 0;
+            // Find a nearby target and move to attack
+            const target = getNearestEnemy(fox.x, fox.y, 8);
+            if (target) {
+              const dx = target.x - fox.x,
+                dy = target.y - fox.y;
+              const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+              fox.x += (dx / dist) * fox.speed * dt;
+              fox.y += (dy / dist) * fox.speed * dt;
+              if (dist < fox.range + 0.6) {
+                if (fox.attackTimer <= 0) {
+                  const dmg =
+                    25 *
+                    (p.damageMult || 1) *
+                    (ABILITIES.spirit_fox.proficiency + 0.05 * (sfRank - 1)) *
+                    (1 + omBuff);
+                  hitEnemy(target, applyCrit(p, dmg));
+                  spawnParticles(target.x, target.y, "#ff8844", 6);
+                  fox.attackTimer =
+                    fox.attackCd * (1 - (p.cooldownReduction || 0));
+                }
+              }
+            }
+            // Harae aura heals companion when nearby
+            if (p.abilities.includes("harae_aura")) {
+              const haRank =
+                (p.abilityRanks && p.abilityRanks["harae_aura"]) || 1;
+              const healRange = ABILITIES.harae_aura.radius + 1 * (haRank - 1);
+              if (
+                (fox.x - p.x) ** 2 + (fox.y - p.y) ** 2 <
+                healRange * healRange
+              ) {
+                fox.hp = Math.min(
+                  fox.maxHp,
+                  fox.hp +
+                    ABILITIES.harae_aura.healPerSec *
+                      dt *
+                      (1 + 0.2 * (haRank - 1)),
+                );
+              }
+            }
           }
         }
 
-        // Periodic abilities with cooldowns
+        // ── TORII GATE (Shrine Maiden) ────────────────────────────────────
+        if (GS.frameCount % 30 === 0) {
+          for (const gate of p.toriGates || []) {
+            if (!gate || gate.hp <= 0) continue;
+            const omRank = p.abilities.includes("omamori_charm")
+              ? (p.abilityRanks && p.abilityRanks["omamori_charm"]) || 1
+              : 0;
+            const omBuff =
+              omRank > 0
+                ? ABILITIES.omamori_charm.dmgBuff * (1 + 0.2 * (omRank - 1))
+                : 0;
+            const tgRank =
+              (p.abilityRanks && p.abilityRanks["torii_gate"]) || 1;
+            const tDmg =
+              ABILITIES.torii_gate.damage *
+              (p.damageMult || 1) *
+              (1 + 0.3 * (tgRank - 1)) *
+              (1 + omBuff);
+            const range = ABILITIES.torii_gate.range;
+            for (const e of GS.enemies) {
+              if (!e.alive) continue;
+              if ((e.x - gate.x) ** 2 + (e.y - gate.y) ** 2 < range * range) {
+                hitEnemy(e, applyCrit(p, tDmg));
+                spawnParticles(e.x, e.y, "#ff4466", 3);
+                break; // one enemy per tick per gate
+              }
+            }
+            gate.life -= dt;
+            // Harae aura heals gates
+            if (p.abilities.includes("harae_aura")) {
+              const haRank =
+                (p.abilityRanks && p.abilityRanks["harae_aura"]) || 1;
+              const healRange = ABILITIES.harae_aura.radius + 1 * (haRank - 1);
+              if (
+                (gate.x - p.x) ** 2 + (gate.y - p.y) ** 2 <
+                healRange * healRange
+              ) {
+                gate.hp = Math.min(
+                  gate.maxHp,
+                  gate.hp +
+                    ABILITIES.harae_aura.healPerSec *
+                      dt *
+                      (1 + 0.2 * (haRank - 1)),
+                );
+              }
+            }
+          }
+          // Cull expired gates
+          if (p.toriGates)
+            p.toriGates = p.toriGates.filter(
+              (g) => g && g.hp > 0 && g.life > 0,
+            );
+        }
+
+        // ── SACRED BARRIER auto-recharge ─────────────────────────────────────
+        if (p.abilities.includes("sacred_barrier")) {
+          if (
+            !p.shieldActive &&
+            (p.abilityCooldowns["sacred_barrier"] || 0) <= 0
+          ) {
+            const sbRank =
+              (p.abilityRanks && p.abilityRanks["sacred_barrier"]) || 1;
+            p.shieldActive = true;
+            p.shieldHp =
+              ABILITIES.sacred_barrier.shieldAmt * (1 + 0.3 * (sbRank - 1));
+            p.maxShieldHp = p.shieldHp;
+            addFloatText(p.x, p.y, "SHIELD!", "#88aaff");
+          }
+        }
+
+        // ── AVATAR FORM trigger ───────────────────────────────────────────────
+        if (
+          p.abilities.includes("avatar_form") &&
+          (p.abilityCooldowns["avatar_form"] || 0) <= 0 &&
+          !p.avatarInvincible
+        ) {
+          const afRank = (p.abilityRanks && p.abilityRanks["avatar_form"]) || 1;
+          p.avatarInvincible = true;
+          p.avatarTimer = ABILITIES.avatar_form.duration + 1 * (afRank - 1);
+          p.abilityCooldowns["avatar_form"] =
+            ABILITIES.avatar_form.cd * (1 - (p.cooldownReduction || 0));
+          addFloatText(p.x, p.y, "AVATAR!", "#ffaa44");
+          spawnParticles(p.x, p.y, "#ffaa44", 20);
+        }
+
+        // ── PERIODIC MILESTONE ABILITIES ──────────────────────────────────────
         const periodicAbilities = [
+          {
+            id: "holy_light",
+            fn: () => {
+              const hlRank =
+                (p.abilityRanks && p.abilityRanks["holy_light"]) || 1;
+              const r = ABILITIES.holy_light.radius + 0.5 * (hlRank - 1);
+              const dmg =
+                ABILITIES.holy_light.damage *
+                (p.damageMult || 1) *
+                (1 + 0.3 * (hlRank - 1));
+              const heal = ABILITIES.holy_light.heal * (1 + 0.4 * (hlRank - 1));
+              blastRadius(p.x, p.y, r, applyCrit(p, dmg));
+              p.hp = Math.min(p.maxHp, p.hp + heal);
+              addFloatText(p.x, p.y, "+" + Math.round(heal) + " HP", "#88aaff");
+              addWaveEffect(p.x, p.y, r, "#88aaff");
+              spawnParticles(p.x, p.y, "#88aaff", 15);
+            },
+          },
+          {
+            id: "blessing",
+            fn: () => {
+              const bRank = (p.abilityRanks && p.abilityRanks["blessing"]) || 1;
+              p.blessingActive = true;
+              p.blessingTimer = ABILITIES.blessing.duration;
+              p.blessingDamageBuff =
+                ABILITIES.blessing.damageBuff * (1 + 0.2 * (bRank - 1));
+              addFloatText(p.x, p.y, "BLESSED!", "#88ffaa");
+            },
+          },
           {
             id: "bell_of_peace",
             fn: () => {
-              p.hp = Math.min(p.maxHp, p.hp + ABILITIES.bell_of_peace.healAmt);
-              addFloatText(
-                p.x,
-                p.y,
-                "+" + ABILITIES.bell_of_peace.healAmt + " HP",
-                "#44ff88",
-              );
+              const bpRank =
+                (p.abilityRanks && p.abilityRanks["bell_of_peace"]) || 1;
+              const pushR =
+                ABILITIES.bell_of_peace.pushRadius + 0.5 * (bpRank - 1);
+              const pushF =
+                ABILITIES.bell_of_peace.pushForce * (1 + 0.2 * (bpRank - 1));
+              for (const e of GS.enemies) {
+                if (!e.alive) continue;
+                const d2 = (e.x - p.x) ** 2 + (e.y - p.y) ** 2;
+                if (d2 < pushR * pushR) {
+                  const da = Math.sqrt(d2) || 1;
+                  e.x += ((e.x - p.x) / da) * pushF;
+                  e.y += ((e.y - p.y) / da) * pushF;
+                }
+              }
+              addWaveEffect(p.x, p.y, pushR, "#ffee88");
+              spawnParticles(p.x, p.y, "#ffee88", 12);
             },
           },
           {
             id: "nirvana_pulse",
             fn: () => {
-              blastRadius(
-                p.x,
-                p.y,
-                5,
+              const npRank =
+                (p.abilityRanks && p.abilityRanks["nirvana_pulse"]) || 1;
+              const baseDmg =
                 ABILITIES.nirvana_pulse.damage *
-                  getPlayerAbilityMultiplier("nirvana_pulse"),
-              );
-              addWaveEffect(p.x, p.y, 5, "#ffffff");
+                (p.damageMult || 1) *
+                (1 + 0.3 * (npRank - 1));
+              // Pillars in expanding ring
+              const maxR = 6;
+              for (let r = 1; r <= maxR; r++) {
+                const dmgMult = 1 - ((r - 1) / maxR) * 0.5;
+                for (let a = 0; a < 8; a++) {
+                  const ang = (a / 8) * Math.PI * 2;
+                  const cx = p.x + Math.cos(ang) * r,
+                    cy = p.y + Math.sin(ang) * r;
+                  for (const e of GS.enemies) {
+                    if (!e.alive) continue;
+                    if ((e.x - cx) ** 2 + (e.y - cy) ** 2 < 0.5)
+                      hitEnemy(e, applyCrit(p, baseDmg * dmgMult));
+                  }
+                }
+              }
+              addWaveEffect(p.x, p.y, maxR, "#ffffff");
             },
           },
           {
-            id: "harae_wave",
+            id: "sufi_step",
             fn: () => {
-              blastRadius(
-                p.x,
-                p.y,
-                5.5,
-                ABILITIES.harae_wave.damage *
-                  getPlayerAbilityMultiplier("harae_wave"),
-              );
-              addWaveEffect(p.x, p.y, 5.5, "#ff4466");
-              spawnParticles(p.x, p.y, "#ff6688", 20);
+              // Spawn restraining cloth under enemies
+              const sufRank =
+                (p.abilityRanks && p.abilityRanks["sufi_step"]) || 1;
+              const clothCount = 2 + sufRank;
+              for (let i = 0; i < clothCount; i++) {
+                const near = getNearestEnemy(
+                  p.x + Math.cos(i) * 3,
+                  p.y + Math.sin(i) * 3,
+                  6,
+                );
+                if (near && near.alive) {
+                  near.restrained = (near.restrained || 0) + 2.5;
+                  spawnParticles(near.x, near.y, "#44ddaa", 8);
+                  // Lifesteal on next hit
+                  near.lifeStealOnHit = (p.abilityRanks["sufi_step"] || 1) >= 1;
+                }
+              }
+              addWaveEffect(p.x, p.y, 4, "#44ddaa");
+            },
+          },
+          {
+            id: "wax_and_wane",
+            fn: () => {
+              const wwRank =
+                (p.abilityRanks && p.abilityRanks["wax_and_wane"]) || 1;
+              const r = ABILITIES.wax_and_wane.radius;
+              let enemiesHit = 0;
+              for (const e of GS.enemies) {
+                if (!e.alive) continue;
+                if ((e.x - p.x) ** 2 + (e.y - p.y) ** 2 < r * r) {
+                  enemiesHit++;
+                }
+              }
+              if (enemiesHit > 0) {
+                const heal =
+                  ABILITIES.wax_and_wane.healAmt * (1 + 0.3 * (wwRank - 1));
+                p.hp = Math.min(p.maxHp, p.hp + heal);
+                addFloatText(
+                  p.x,
+                  p.y,
+                  "+" + Math.round(heal) + " HP",
+                  "#88ffcc",
+                );
+                blastRadius(
+                  p.x,
+                  p.y,
+                  r,
+                  applyCrit(p, 15 * (p.damageMult || 1)),
+                );
+              } else {
+                const selfDmg = Math.max(
+                  2,
+                  ABILITIES.wax_and_wane.selfDmg * (1 - 0.1 * (wwRank - 1)),
+                );
+                takeDamage(p, selfDmg);
+                addFloatText(p.x, p.y, "-" + Math.round(selfDmg), "#ff4444");
+              }
+              addWaveEffect(p.x, p.y, r, "#88ffcc");
+            },
+          },
+          {
+            id: "whirl",
+            fn: () => {
+              const wRank = (p.abilityRanks && p.abilityRanks["whirl"]) || 1;
+              const r = ABILITIES.whirl.radius + 0.4 * (wRank - 1);
+              const dmg =
+                ABILITIES.whirl.damage *
+                (p.damageMult || 1) *
+                (1 + 0.25 * (wRank - 1));
+              blastRadius(p.x, p.y, r, applyCrit(p, dmg));
+              spawnParticles(p.x, p.y, "#44ddaa", 12);
+              addWaveEffect(p.x, p.y, r, "#44ddaa");
             },
           },
           {
             id: "zikr_wave",
             fn: () => {
-              blastRadius(
-                p.x,
-                p.y,
-                4.5,
-                ABILITIES.zikr_wave.damage *
-                  getPlayerAbilityMultiplier("zikr_wave"),
-              );
-              addWaveEffect(p.x, p.y, 4.5, "#44ddaa");
-            },
-          },
-          {
-            id: "om_pulse",
-            fn: () => {
-              for (const e of GS.enemies) {
-                if (!e.alive) continue;
-                const d2 = (e.x - p.x) ** 2 + (e.y - p.y) ** 2;
-                if (d2 < 18) {
-                  hitEnemy(
-                    e,
-                    ABILITIES.om_pulse.damage *
-                      getPlayerAbilityMultiplier("om_pulse"),
-                  );
-                  const da = Math.sqrt(d2) || 1;
-                  e.x += ((e.x - p.x) / da) * 3;
-                  e.y += ((e.y - p.y) / da) * 3;
+              const zkRank =
+                (p.abilityRanks && p.abilityRanks["zikr_wave"]) || 1;
+              const armorReduce =
+                ABILITIES.zikr_wave.armorReduce + 0.05 * (zkRank - 1);
+              const dur = ABILITIES.zikr_wave.duration;
+              // Apply armor reduction in a cone toward nearest enemy
+              const near = getNearestEnemy(p.x, p.y, 10);
+              if (near) {
+                const dx2 = near.x - p.x,
+                  dy2 = near.y - p.y;
+                const baseAng = Math.atan2(dy2, dx2);
+                for (const e of GS.enemies) {
+                  if (!e.alive) continue;
+                  const eAng = Math.atan2(e.y - p.y, e.x - p.x);
+                  const angDiff = Math.abs(eAng - baseAng);
+                  const d2 = (e.x - p.x) ** 2 + (e.y - p.y) ** 2;
+                  if (angDiff < 0.8 && d2 < 64) {
+                    const id = GS.enemies.indexOf(e);
+                    p.armoredWeakened.set(id, {
+                      reduce: armorReduce,
+                      timer: dur,
+                    });
+                    spawnParticles(e.x, e.y, "#44ddaa", 4);
+                  }
                 }
               }
-              addWaveEffect(p.x, p.y, 4.3, "#ffaaff");
+              addWaveEffect(p.x, p.y, 5, "#44ddaa");
             },
           },
           {
-            id: "lotus_strike",
+            id: "third_eye",
             fn: () => {
-              for (let a = 0; a < 8; a++) {
-                const ang = (a / 8) * Math.PI * 2;
-                fireProjectile(
-                  p.x,
-                  p.y,
-                  Math.cos(ang) * 9,
-                  Math.sin(ang) * 9,
-                  ABILITIES.lotus_strike.damage,
-                  "#ffaacc",
-                  "player",
-                  undefined,
-                  "lotus_strike",
-                );
+              const teRank =
+                (p.abilityRanks && p.abilityRanks["third_eye"]) || 1;
+              const r = ABILITIES.third_eye.radius + 0.5 * (teRank - 1);
+              const dmg =
+                ABILITIES.third_eye.damage *
+                (p.damageMult || 1) *
+                (1 + 0.3 * (teRank - 1));
+              blastRadius(p.x, p.y, r, applyCrit(p, dmg));
+              // Burn nearby
+              for (const e of GS.enemies) {
+                if (!e.alive) continue;
+                if ((e.x - p.x) ** 2 + (e.y - p.y) ** 2 < r * r)
+                  applyBurn(
+                    p,
+                    e,
+                    ABILITIES.third_eye.burnDps * (1 + 0.3 * (teRank - 1)),
+                    ABILITIES.third_eye.burnDur,
+                  );
               }
+              addWaveEffect(p.x, p.y, r, "#ff88ff");
+              spawnParticles(p.x, p.y, "#ff88ff", 15);
             },
           },
           {
-            id: "divine_geometry",
+            id: "om_surge",
             fn: () => {
-              for (let a = 0; a < 6; a++) {
-                const ang = (a / 6) * Math.PI * 2;
-                fireProjectile(
-                  p.x,
-                  p.y,
-                  Math.cos(ang) * 10,
-                  Math.sin(ang) * 10,
-                  ABILITIES.divine_geometry.damage,
-                  "#44ffcc",
-                  "player",
-                  undefined,
-                  "divine_geometry",
-                );
+              const osRank =
+                (p.abilityRanks && p.abilityRanks["om_surge"]) || 1;
+              const burnDps =
+                ABILITIES.om_surge.burnDps * (1 + 0.3 * (osRank - 1));
+              const burnDur = ABILITIES.om_surge.burnDur;
+              // Zip through — damage and burn all enemies in radius
+              for (const e of GS.enemies) {
+                if (!e.alive) continue;
+                if ((e.x - p.x) ** 2 + (e.y - p.y) ** 2 < 25) {
+                  hitEnemy(e, applyCrit(p, 20 * (p.damageMult || 1)));
+                  applyBurn(p, e, burnDps, burnDur);
+                }
               }
+              spawnParticles(p.x, p.y, "#ffaaff", 25);
+              addWaveEffect(p.x, p.y, 5, "#ffaaff");
             },
           },
           {
-            id: "smite",
+            id: "kagura_dance",
             fn: () => {
-              const near = getNearestEnemy(p.x, p.y, 15);
-              if (near) {
-                const sm =
-                  getPlayerAbilityMultiplier("smite") *
-                  (p.abilities.includes("third_eye") ? 1.25 : 1);
-                const rank = (p.abilityRanks && p.abilityRanks.smite) || 1;
-                const radius = 1.5 + 0.8 * (rank - 1);
-                blastRadius(
-                  near.x,
-                  near.y,
-                  radius,
-                  ABILITIES.smite.damage * sm,
-                );
-                spawnParticles(near.x, near.y, "#ffff44", 12 + 6 * (rank - 1));
-                addWaveEffect(near.x, near.y, radius, "#ffff44");
-              }
+              const kgRank =
+                (p.abilityRanks && p.abilityRanks["kagura_dance"]) || 1;
+              p.kaguraActive = true;
+              p.kaguraTimer = 6 + kgRank;
+              spawnParticles(p.x, p.y, "#ff4466", 20);
+              addWaveEffect(p.x, p.y, ABILITIES.kagura_dance.radius, "#ff4466");
             },
           },
           {
-            id: "crescent_slash",
+            id: "torii_gate",
             fn: () => {
-              const near = getNearestEnemy(p.x, p.y);
-              if (near) {
-                const dx = near.x - p.x,
-                  dy = near.y - p.y;
-                const d = Math.sqrt(dx * dx + dy * dy) || 1;
-                fireProjectile(
-                  p.x,
-                  p.y,
-                  (dx / d) * 12,
-                  (dy / d) * 12,
-                  ABILITIES.crescent_slash.damage,
-                  "#aaffee",
-                  "player",
-                  undefined,
-                  "crescent_slash",
-                );
+              const tgRank =
+                (p.abilityRanks && p.abilityRanks["torii_gate"]) || 1;
+              const gateCount = tgRank;
+              p.toriGates = p.toriGates || [];
+              // Remove old expired gates above count
+              for (let g = 0; g < gateCount; g++) {
+                const ang = (g / gateCount) * Math.PI * 2;
+                const gx = p.x + Math.cos(ang) * 3,
+                  gy = p.y + Math.sin(ang) * 3;
+                p.toriGates.push({
+                  x: gx,
+                  y: gy,
+                  hp: 80 + 20 * tgRank,
+                  maxHp: 80 + 20 * tgRank,
+                  life: 12,
+                });
+                spawnParticles(gx, gy, "#ff4466", 8);
               }
             },
           },
@@ -4045,16 +5137,51 @@
         for (const { id, fn } of periodicAbilities) {
           if (p.abilities.includes(id) && (p.abilityCooldowns[id] || 0) <= 0) {
             fn();
-            // notify server so other clients can show this ability effect
             try {
-              if (typeof socket !== "undefined" && socket && socket.connected) {
-                socket.emit("ability", { id: id, x: p.x, y: p.y });
-              }
+              if (typeof socket !== "undefined" && socket && socket.connected)
+                socket.emit("ability", { id, x: p.x, y: p.y });
             } catch (e) {}
             p.abilityCooldowns[id] = Math.max(
-              0,
+              0.1,
               ABILITIES[id].cd * (1 - (p.cooldownReduction || 0)),
             );
+          }
+        }
+
+        // Tick all ability cooldowns
+        for (const ab of p.abilities) {
+          if ((p.abilityCooldowns[ab] || 0) > 0) p.abilityCooldowns[ab] -= dt;
+        }
+
+        // ── DIVINE GEOMETRY passive: mark enemies on hit (checked in hitEnemy) ──
+        // ── SAMSARA: mirror fires with player at proficiency ─────────────────
+        if (p.abilities.includes("samsara") && p.innateTimer <= -0.3) {
+          // samsara fires after player innate with offset
+          const samRank = (p.abilityRanks && p.abilityRanks["samsara"]) || 1;
+          const prof = ABILITIES.samsara.proficiency + 0.05 * (samRank - 1);
+          if (clsId === "monk") {
+            const near = getNearestEnemy(
+              p.samsaraX || p.x,
+              p.samsaraY || p.y,
+              10,
+            );
+            if (near) {
+              const ang = Math.atan2(
+                near.y - (p.samsaraY || p.y),
+                near.x - (p.samsaraX || p.x),
+              );
+              fireProjectile(
+                p.samsaraX || p.x,
+                p.samsaraY || p.y,
+                Math.cos(ang) * 8,
+                Math.sin(ang) * 8,
+                ABILITIES.lotus_strike.damage * prof * (p.damageMult || 1),
+                "#ffcc88",
+                "player",
+                undefined,
+                "samsara",
+              );
+            }
           }
         }
       }
@@ -4227,12 +5354,33 @@
         const abilBar = document.getElementById("hud-abilities");
         abilBar.innerHTML = "";
         if (!GS.spectating) {
+          // Show innate ability first
+          const innateId = p.cls && p.cls.innateAbility;
+          if (innateId && ABILITIES[innateId]) {
+            const def = ABILITIES[innateId];
+            const slot = document.createElement("div");
+            slot.className = "ability-slot active";
+            slot.style.borderColor = "#ffd700";
+            const iRankDisp = (p.abilityRanks && p.abilityRanks[innateId]) || 1;
+            slot.innerHTML = `<span>${def.icon}</span><span class="akey" style="color:#ffd700">Lv${iRankDisp}</span>`;
+            const iCd = Math.max(0, p.innateTimer || 0);
+            if (iCd > 0.05) {
+              const ov = document.createElement("div");
+              ov.className = "cd-overlay";
+              ov.textContent = iCd.toFixed(1);
+              slot.appendChild(ov);
+            }
+            abilBar.appendChild(slot);
+          }
           for (const ab of p.abilities) {
+            if (ab === innateId) continue; // already shown
             const def = ABILITIES[ab];
             if (!def) continue;
             const slot = document.createElement("div");
             slot.className = "ability-slot active";
-            slot.innerHTML = `<span>${def.icon}</span><span class="akey">${def.name.substring(0, 6)}</span>`;
+            const rank = (p.abilityRanks && p.abilityRanks[ab]) || 1;
+            const rankStr = rank > 1 ? ` R${rank}` : "";
+            slot.innerHTML = `<span>${def.icon}</span><span class="akey">${def.name.substring(0, 5)}${rankStr}</span>`;
             const cd = p.abilityCooldowns[ab] || 0;
             if (cd > 0) {
               const ov = document.createElement("div");
@@ -4289,7 +5437,11 @@
         const p = GS.player;
         if (!p) return 1;
         const rank = (p.abilityRanks && p.abilityRanks[abilityId]) || 1;
-        return (p.damageMult || 1) * (1 + 0.25 * (rank - 1));
+        const blessBuff =
+          p.blessingActive && p.blessingDamageBuff
+            ? 1 + p.blessingDamageBuff
+            : 1;
+        return (p.damageMult || 1) * blessBuff * (1 + 0.2 * (rank - 1));
       }
 
       function applyStatIncrease(player, stat, level) {
@@ -4297,10 +5449,10 @@
         let label = "";
         switch (stat) {
           case "speed":
-            player.speed = (player.speed || 1) + 0.12;
+            player.speed = (player.speed || 1) + 0.1;
             label = "+Speed";
             break;
-          case "maxHp":
+          case "maxHp": {
             const add = Math.max(6, Math.floor(player.maxHp * 0.12));
             player.maxHp += add;
             player.hp = Math.min(
@@ -4309,22 +5461,49 @@
             );
             label = `+${add} HP`;
             break;
+          }
           case "damageMult":
-            player.damageMult = (player.damageMult || 1) + 0.12;
+            player.damageMult = (player.damageMult || 1) + 0.1;
             label = "+Damage";
             break;
           case "critMult":
-            player.critMult = (player.critMult || 1) + 0.12;
-            label = "+Crit";
+            player.critMult = (player.critMult || 1) + 0.15;
+            label = "+CritDmg";
+            break;
+          case "critChance":
+            player.critChance = Math.min(
+              0.75,
+              (player.critChance || 0.05) + 0.04,
+            );
+            label = "+CritChance";
             break;
           case "defense":
             player.defense = (player.defense || 0) + 0.05;
             label = "+Defense";
             break;
+          case "evasion":
+            player.evasion = Math.min(0.65, (player.evasion || 0) + 0.04);
+            label = "+Evasion";
+            break;
+          case "accuracy":
+            player.accuracy = Math.min(1.5, (player.accuracy || 1.0) + 0.08);
+            label = "+Accuracy";
+            break;
+          case "hpRegen":
+            player.hpRegen = (player.hpRegen || 0) + 0.5;
+            label = "+HPRegen";
+            break;
+          case "shootSpeed":
+            player.shootSpeed = Math.min(
+              2.5,
+              (player.shootSpeed || 1.0) + 0.12,
+            );
+            label = "+ShootSpd";
+            break;
           case "cooldownReduction":
             player.cooldownReduction = Math.min(
               0.5,
-              (player.cooldownReduction || 0) + 0.06,
+              (player.cooldownReduction || 0) + 0.05,
             );
             label = "+CDR";
             break;
@@ -4339,7 +5518,12 @@
           "maxHp",
           "damageMult",
           "critMult",
+          "critChance",
           "defense",
+          "evasion",
+          "accuracy",
+          "hpRegen",
+          "shootSpeed",
           "cooldownReduction",
         ];
         const stat = stats[Math.floor(Math.random() * stats.length)];
@@ -4376,10 +5560,14 @@
             "maxHp",
             "damageMult",
             "critMult",
+            "critChance",
             "defense",
+            "evasion",
+            "accuracy",
+            "hpRegen",
+            "shootSpeed",
             "cooldownReduction",
           ];
-          // shuffle and pick 3
           const pool = stats.slice();
           for (let i = pool.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -4392,16 +5580,26 @@
               speed: "+Speed",
               maxHp: "+Max HP",
               damageMult: "+Damage",
-              critMult: "+Crit",
+              critMult: "+Crit Dmg",
+              critChance: "+Crit Chance",
               defense: "+Defense",
+              evasion: "+Evasion",
+              accuracy: "+Accuracy",
+              hpRegen: "+HP Regen",
+              shootSpeed: "+Shoot Spd",
               cooldownReduction: "+CDR",
             };
             const descMap = {
               speed: "Increase movement speed",
               maxHp: "Increase maximum HP",
               damageMult: "Increase damage dealt",
-              critMult: "Increase critical damage",
+              critMult: "Increase critical hit damage",
+              critChance: "Increase critical hit chance",
               defense: "Reduce incoming damage",
+              evasion: "Chance to avoid enemy contact damage",
+              accuracy: "Attacks are harder for enemies to evade",
+              hpRegen: "Passively regenerate HP over time",
+              shootSpeed: "Fire innate abilities faster",
               cooldownReduction: "Reduce ability cooldowns",
             };
             const card = document.createElement("div");
@@ -4453,8 +5651,10 @@
           return;
         }
 
-        // ability mode
-        const allPool = player.cls.abilityPool.slice();
+        // ability mode — exclude innate abilities
+        const allPool = (player.cls.abilityPool || []).filter(
+          (a) => !ABILITIES[a] || !ABILITIES[a].innate,
+        );
         const available = allPool.filter((a) => !player.abilities.includes(a));
         let picks = [];
         if (available.length >= 3) {
@@ -4465,6 +5665,12 @@
           }
         } else {
           // sample with replacement from full pool so we always show 3 cards
+          if (allPool.length === 0) {
+            // No abilities left - give 3 stat cards instead
+            closeLevelUpModal();
+            showLevelUpModal(player, "stat");
+            return;
+          }
           while (picks.length < 3)
             picks.push(allPool[Math.floor(Math.random() * allPool.length)]);
         }
@@ -4732,6 +5938,7 @@
         waveEffects.length = 0;
         CAM.x = 0;
         CAM.y = 0;
+        GS.floatingTexts = [];
 
         GS.player = createPlayer(GS.selectedClass, GS.playerName);
         document.getElementById("hud-name").textContent =
@@ -4986,20 +6193,41 @@
               y = data.y || 0;
             switch (data.id) {
               case "nirvana_pulse":
-                addWaveEffect(x, y, 5, "#ffffff");
+                addWaveEffect(x, y, 6, "#ffffff");
                 break;
-              case "harae_wave":
+              case "harae_aura":
                 addWaveEffect(x, y, 5.5, "#ff4466");
                 spawnParticles(x, y, "#ff6688", 20);
                 break;
-              case "zikr_wave":
-                addWaveEffect(x, y, 4.5, "#44ddaa");
+              case "kagura_dance":
+                addWaveEffect(x, y, 4, "#ff4466");
+                spawnParticles(x, y, "#ffaacc", 15);
                 break;
-              case "om_pulse":
-                addWaveEffect(x, y, 4.3, "#ffaaff");
+              case "holy_light":
+                addWaveEffect(x, y, 4, "#88aaff");
+                spawnParticles(x, y, "#88aaff", 15);
+                break;
+              case "zikr_wave":
+                addWaveEffect(x, y, 5, "#44ddaa");
+                break;
+              case "whirl":
+                addWaveEffect(x, y, 3, "#44ddaa");
+                spawnParticles(x, y, "#44ddaa", 10);
+                break;
+              case "third_eye":
+                addWaveEffect(x, y, 4, "#ff88ff");
+                spawnParticles(x, y, "#ff88ff", 12);
+                break;
+              case "om_surge":
+                addWaveEffect(x, y, 5, "#ffaaff");
+                spawnParticles(x, y, "#ffaaff", 12);
                 break;
               case "bell_of_peace":
-                addFloatText(x, y, "+HP", "#44ff88");
+                addWaveEffect(x, y, 5, "#ffee88");
+                spawnParticles(x, y, "#ffee88", 12);
+                break;
+              case "wax_and_wane":
+                addWaveEffect(x, y, 4, "#88ffcc");
                 break;
               default:
                 addWaveEffect(x, y, 3, "#ffffff");
