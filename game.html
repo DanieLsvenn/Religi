@@ -632,205 +632,6 @@
       ::-webkit-scrollbar-thumb {
         background: var(--border);
       }
-
-      /* ── Lobby Browser ── */
-      #lobby-browser-screen {
-        background: radial-gradient(
-          ellipse at 50% 20%,
-          #0a1a2e 0%,
-          #0a0a0f 70%
-        );
-        gap: 16px;
-      }
-      #lobby-browser-screen h2 {
-        font-size: 14px;
-        color: var(--gold);
-      }
-      .lobby-list {
-        width: 700px;
-        max-height: 340px;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-      .lobby-entry {
-        background: var(--panel);
-        border: 2px solid var(--border);
-        padding: 12px 16px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        cursor: pointer;
-        transition: all 0.15s;
-      }
-      .lobby-entry:hover {
-        border-color: var(--teal);
-      }
-      .lobby-entry .le-name {
-        font-size: 9px;
-        color: var(--gold);
-      }
-      .lobby-entry .le-meta {
-        font-size: 7px;
-        color: var(--dim);
-        line-height: 2;
-      }
-      .lobby-entry .le-players {
-        font-size: 10px;
-        color: var(--teal);
-        text-align: right;
-      }
-      .lobby-entry .le-expires {
-        font-size: 6px;
-        color: var(--dim);
-        text-align: right;
-      }
-      .lobby-entry.full {
-        opacity: 0.5;
-        cursor: default;
-      }
-      .lobby-entry.started {
-        border-color: #334;
-      }
-      .lobby-empty {
-        font-size: 8px;
-        color: var(--dim);
-        text-align: center;
-        padding: 40px;
-      }
-      .lobby-browser-actions {
-        display: flex;
-        gap: 12px;
-      }
-
-      /* ── In-game Leaderboard panel ── */
-      #leaderboard-panel {
-        position: absolute;
-        top: 210px;
-        right: 14px;
-        width: 210px;
-        background: rgba(6, 6, 14, 0.93);
-        border: 2px solid var(--border);
-        padding: 8px;
-        font-size: 8px;
-        z-index: 60;
-        pointer-events: none;
-      }
-      #leaderboard-panel.hidden {
-        display: none;
-      }
-      #leaderboard-panel h3 {
-        font-size: 9px;
-        color: var(--gold);
-        margin-bottom: 6px;
-        border-bottom: 1px solid var(--border);
-        padding-bottom: 4px;
-      }
-      .lb-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 4px;
-        padding: 3px 2px;
-        border-bottom: 1px solid #1a1a28;
-        font-size: 7px;
-      }
-      .lb-row.lb-you {
-        color: var(--gold);
-      }
-      .lb-row.lb-dead {
-        opacity: 0.45;
-        text-decoration: line-through;
-      }
-      .lb-rank {
-        width: 16px;
-        color: var(--dim);
-      }
-      .lb-name {
-        flex: 1;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-      .lb-score {
-        color: var(--teal);
-        text-align: right;
-      }
-
-      /* ── Spectator overlay ── */
-      #spectator-hud {
-        position: absolute;
-        bottom: 80px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(0, 0, 0, 0.75);
-        border: 2px solid var(--red);
-        padding: 12px 24px;
-        font-size: 8px;
-        color: var(--red);
-        text-align: center;
-        z-index: 80;
-        pointer-events: none;
-        letter-spacing: 2px;
-      }
-      #spectator-hud.hidden {
-        display: none;
-      }
-      #spectator-hud .spec-sub {
-        font-size: 6px;
-        color: var(--dim);
-        margin-top: 6px;
-      }
-
-      /* ── Death modal (spectate / leave) ── */
-      #death-modal {
-        position: absolute;
-        inset: 0;
-        background: #000000cc;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        z-index: 250;
-      }
-      #death-modal.hidden {
-        display: none;
-      }
-      #death-modal h2 {
-        font-size: 20px;
-        color: var(--red);
-        text-shadow: 0 0 20px var(--red);
-        margin-bottom: 10px;
-      }
-      #death-modal .death-stats {
-        font-size: 8px;
-        color: var(--text);
-        line-height: 2.4;
-        text-align: center;
-        margin-bottom: 20px;
-      }
-      #death-modal .death-stats span {
-        color: var(--gold);
-      }
-      .death-actions {
-        display: flex;
-        gap: 16px;
-      }
-
-      /* ── Score display in HUD ── */
-      #hud-score-display {
-        position: absolute;
-        bottom: 14px;
-        left: 14px;
-        font-size: 8px;
-        text-align: left;
-      }
-      #hud-score-display .score-val {
-        color: var(--gold);
-        font-size: 14px;
-      }
     </style>
   </head>
   <body>
@@ -848,12 +649,7 @@
         <span title="Islam">☽</span><span title="Hinduism">🕉</span
         ><span title="Shinto">⛩</span>
       </div>
-      <div style="display: flex; gap: 12px">
-        <button class="btn" id="btn-play">► PLAY SOLO</button>
-        <button class="btn green-btn" id="btn-multiplayer">
-          ⚡ MULTIPLAYER
-        </button>
-      </div>
+      <button class="btn" id="btn-play">► PLAY</button>
       <div
         style="
           margin-top: 14px;
@@ -865,24 +661,6 @@
       >
         SURVIVE 15 MINUTES · ANSWER TRIVIA TO UNLOCK ABILITIES<br />
         ALL RELIGIONS TREATED WITH RESPECT &amp; CURIOSITY
-      </div>
-    </div>
-
-    <!-- LOBBY BROWSER SCREEN -->
-    <div class="screen hidden" id="lobby-browser-screen">
-      <h2>⚡ SACRED ARENAS</h2>
-      <div style="font-size: 7px; color: var(--dim); margin-bottom: 12px">
-        Join an existing arena or create your own
-      </div>
-      <div class="lobby-list" id="lobby-list">
-        <div class="lobby-empty">Loading arenas...</div>
-      </div>
-      <div class="lobby-browser-actions" style="margin-top: 14px">
-        <button class="btn" id="btn-browser-back">◄ BACK</button>
-        <button class="btn" id="btn-refresh-lobbies">↻ REFRESH</button>
-        <button class="btn green-btn" id="btn-create-lobby">
-          + CREATE ARENA
-        </button>
       </div>
     </div>
 
@@ -956,32 +734,6 @@
         <div class="kills" id="hud-kills">0</div>
         <div style="font-size: 6px; color: var(--dim)">DEFEATED</div>
       </div>
-      <div id="hud-score-display">
-        <div style="font-size: 6px; color: var(--dim)">SCORE</div>
-        <div class="score-val" id="hud-score">0</div>
-      </div>
-    </div>
-
-    <!-- IN-GAME LEADERBOARD PANEL -->
-    <div id="leaderboard-panel" class="hidden">
-      <h3>★ LEADERBOARD</h3>
-      <div id="lb-rows"></div>
-    </div>
-
-    <!-- SPECTATOR HUD -->
-    <div id="spectator-hud" class="hidden">
-      ☠ SPECTATING
-      <div class="spec-sub">You have fallen — watching the battle unfold</div>
-    </div>
-
-    <!-- DEATH MODAL -->
-    <div id="death-modal" class="hidden">
-      <h2>✦ YOU HAVE FALLEN ✦</h2>
-      <div class="death-stats" id="death-stats"></div>
-      <div class="death-actions">
-        <button class="btn" id="btn-spectate">👁 SPECTATE</button>
-        <button class="btn danger" id="btn-leave-match">✕ LEAVE</button>
-      </div>
     </div>
 
     <!-- MINIMAP -->
@@ -1017,7 +769,6 @@
       <div class="end-stats" id="end-stats"></div>
       <div style="display: flex; gap: 16px; margin-top: 20px">
         <button class="btn" id="btn-play-again">► PLAY AGAIN</button>
-        <button class="btn" id="btn-back-to-menu">◄ MENU</button>
       </div>
     </div>
 
@@ -2262,10 +2013,6 @@
         score: 0,
         leaderboard: [],
         graves: [],
-        spectating: false, // true when player has died and chosen to spectate
-        playerName: "", // set from name prompt
-        spectatorTarget: null, // world coords to follow when spectating
-        currentLobbyId: null, // active lobby id for rejoining
       };
 
       let lastTimestamp = 0;
