@@ -5895,6 +5895,8 @@
       }
 
       function startLobbyCountdown() {
+        // In multiplayer the server fires startMatch — only use countdown for solo
+        if (socket && socket.connected) return;
         let t = 20;
         document.getElementById("lobby-countdown").textContent = t + "s";
         GS.lobbyTimer = setInterval(() => {
@@ -6016,20 +6018,13 @@
             ) || "Player" + Math.floor(Math.random() * 1000);
         }
 
+        // Always connect to same origin — no hardcoded server URL needed.
+        // The ?server= param can still override for local dev cross-origin testing.
         const urlParams = new URLSearchParams(location.search);
         const serverOverride = urlParams.get("server");
-        let serverUrl = serverOverride || "";
-        if (!serverUrl) {
-          if (
-            location.hostname !== "localhost" &&
-            location.hostname !== "127.0.0.1"
-          ) {
-            serverUrl = "https://YOUR_SERVER_DOMAIN";
-          }
-        }
-        socket = serverUrl
-          ? io(serverUrl, { transports: ["websocket", "polling"] })
-          : io();
+        socket = serverOverride
+          ? io(serverOverride, { transports: ["websocket"] })
+          : io({ transports: ["websocket"] });
 
         socket.on("connect", () => {
           if (onReady) onReady();
@@ -6112,19 +6107,28 @@
         });
 
         socket.on("startMatch", (initState) => {
+          // Reset netPlayers and seed with initial state from server (excluding self)
           netPlayers = {};
           if (initState && Array.isArray(initState.playerStates)) {
-            for (const p of initState.playerStates) netPlayers[p.id] = p;
+            for (const p of initState.playerStates) {
+              if (p.id !== socket.id) netPlayers[p.id] = p;
+            }
           }
-          GS.player = createPlayer(GS.selectedClass, GS.playerName);
-          startMatch();
+          // Guard: don't re-init if match already running (e.g. host's countdown fired first)
+          if (!GS.running) {
+            GS.player = createPlayer(GS.selectedClass, GS.playerName);
+            startMatch();
+          }
           startSendingInputs();
         });
 
         socket.on("state", (playersArray) => {
-          const map = {};
-          for (const p of playersArray) map[p.id] = p;
-          netPlayers = map;
+          // Merge into netPlayers rather than replacing, so players don't flicker
+          // when they're temporarily absent from a snapshot. Skip our own entry.
+          for (const p of playersArray) {
+            if (socket && p.id === socket.id) continue;
+            netPlayers[p.id] = p;
+          }
         });
 
         socket.on("projectile", (proj) => {

@@ -5,7 +5,12 @@ const path = require("path");
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*" } });
+const io = new Server(server, {
+  cors: { origin: "*" },
+  transports: ["websocket"], // force WS — polling breaks on Render.com reverse proxy
+  pingTimeout: 60000,
+  pingInterval: 25000,
+});
 
 app.use(express.static(__dirname));
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "game.html")));
@@ -15,6 +20,12 @@ const MAX_LOBBY_PLAYERS = 10;
 const TICK_RATE = 20;
 const DT = 1 / TICK_RATE;
 const LOBBY_LIFETIME_MS = 15 * 60 * 1000; // 15 minutes
+
+// World bounds matching the client exactly:
+// ARENA_WIDTH=6792, ARENA_HEIGHT=3704, WORLD_SCALE=38
+// WORLD_BOUNDS_X = 6792/2/38 ≈ 89,  WORLD_BOUNDS_Y = 3704/2/38 ≈ 48
+const WORLD_BOUNDS_X = 89;
+const WORLD_BOUNDS_Y = 48;
 
 // ─── State ────────────────────────────────────────────────────────────────────
 const players = {}; // socketId → player meta
@@ -399,13 +410,22 @@ setInterval(() => {
   const now = Date.now();
   for (const lobbyId in lobbies) {
     const lobby = lobbies[lobbyId];
-    const list = Object.values(lobby.members).filter((p) => !p.dead);
-    for (const p of list) {
+    const allMembers = Object.values(lobby.members);
+
+    for (const p of allMembers) {
+      if (p.dead) continue; // dead players don't move, but are still broadcast
       const dx = p.input?.dx || 0;
       const dy = p.input?.dy || 0;
       const speed = p.input?.speed || 2.4;
-      p.x = Math.max(-13, Math.min(13, p.x + dx * speed * DT));
-      p.y = Math.max(-13, Math.min(13, p.y + dy * speed * DT));
+      // Use world bounds matching the client (was ±13, caused players to freeze)
+      p.x = Math.max(
+        -WORLD_BOUNDS_X,
+        Math.min(WORLD_BOUNDS_X, p.x + dx * speed * DT),
+      );
+      p.y = Math.max(
+        -WORLD_BOUNDS_Y,
+        Math.min(WORLD_BOUNDS_Y, p.y + dy * speed * DT),
+      );
 
       // Idle auto-fire
       const idleMs = now - (p.lastActive || 0);
@@ -431,7 +451,22 @@ setInterval(() => {
         p._idleCounter = 0;
       }
     }
-    if (list.length > 0) io.to(lobbyId).emit("state", list);
+
+    // Broadcast all members (alive + dead) so renderRemotePlayers always has data.
+    // Each entry includes all fields the client needs: id, x, y, cls, name, dead, hp, level.
+    if (allMembers.length > 0) {
+      const snapshot = allMembers.map((p) => ({
+        id: p.id,
+        x: p.x,
+        y: p.y,
+        cls: p.cls,
+        name: p.name,
+        dead: p.dead,
+        hp: p.hp,
+        level: p.level,
+      }));
+      io.to(lobbyId).emit("state", snapshot);
+    }
   }
 }, 1000 / TICK_RATE);
 
