@@ -1054,23 +1054,32 @@
       <button class="btn green-btn" id="btn-create-lobby">
         + CREATE ARENA
       </button>
-      <!-- ARENA SETTINGS SCREEN -->
-      <div class="arena-settings">
+    </div>
+    <!-- ARENA SETTINGS SCREEN -->
+    <div class="arena-settings">
 
-        <input id="room-name" placeholder="Arena Name" />
+      <input id="room-name" placeholder="Arena Name" />
 
-        <select id="room-max-players">
-          1-10 options
-        </select>
+      <select id="room-max-players">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="0">10</option>
+      </select>
 
-        <select id="room-time">
-          <option value="300">5 min</option>
-          <option value="600">10 min</option>
-          <option value="900">15 min</option>
-          <option value="1200">20 min</option>
-        </select>
+      <select id="room-time">
+        <option value="300">5 minutes</option>
+        <option value="600">10 minutes</option>
+        <option value="900">15 minutes</option>
+        <option value="1200">20 minutes</option>
+      </select>
 
-      </div>
     </div>
   </div>
 
@@ -6608,6 +6617,8 @@
           } else {
             showScreen("lobby-screen");
             buildLobby();
+
+            document.getElementById("btn-start-now").textContent = "► START GAME";
           }
         });
       document
@@ -6629,13 +6640,21 @@
       document
         .getElementById("btn-start-now")
         .addEventListener("click", () => {
-          if (typeof socket !== "undefined" && socket)
-            socket.emit("startNow");
-          else startMatch();
+
+          // Multiplayer
+          if (GS.multiplayerMode) {
+            if (socket) {
+              socket.emit("startNow");
+            }
+            return;
+          }
+
+          // Singleplayer
+          startMatch();
         });
       document
         .getElementById("btn-start-now")
-        .style.display = GS.isHost ? "inline-flex" : "none";
+        .style.display = !GS.multiplayerMode ? "inline-flex" : GS.isHost ? "inline-flex" : "none";
       document
         .getElementById("btn-play-again")
         .addEventListener("click", () => {
