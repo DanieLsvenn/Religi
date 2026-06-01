@@ -108,7 +108,7 @@ io.on("connection", (socket) => {
       id,
       maxPlayers: maxPlayers || 10,
       gameTime: gameTime || 900,
-      name: playerName ? `${playerName}'s Lobby` : "Sacred Arena",
+      name: name || (playerName ? `${playerName}'s Lobby` : "Sacred Arena"),
       hostId: socket.id,
       hostName: playerName || "Host",
       members: {},
@@ -358,6 +358,7 @@ io.on("connection", (socket) => {
     lobby.started = true;
     io.to(lobby.id).emit("startMatch", {
       playerStates: Object.values(lobby.members),
+      gameTime: lobby.gameTime,
     });
     broadcastLobbyList();
   });
