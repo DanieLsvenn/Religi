@@ -1052,6 +1052,7 @@
     <div style="display: flex; gap: 16px; margin-top: 16px">
       <button class="btn" id="btn-back-class">◄ BACK</button>
       <button class="btn green-btn" id="btn-start-now">START NOW ►</button>
+      <button id="btn-exit-room" class="menu-btn danger">EXIT ROOM</button>
     </div>
   </div>
 
@@ -6581,6 +6582,28 @@
           if (typeof socket !== "undefined" && socket)
             socket.emit("startNow");
           else startMatch();
+        });
+      document
+        .getElementById("btn-exit-room")
+        .addEventListener("click", () => {
+
+          if (socket && GS.player) {
+            socket.emit("exitRoom", {
+              x: GS.player.x,
+              y: GS.player.y,
+              name: GS.playerName,
+              wave: GS.wave,
+              score: GS.score,
+            });
+          }
+
+          GS.currentLobbyId = null;
+          GS.running = false;
+          GS.spectating = false;
+
+          stopSendingInputs();
+
+          showScreen("title-screen");
         });
       document
         .getElementById("btn-play-again")
