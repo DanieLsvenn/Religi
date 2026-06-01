@@ -53,7 +53,7 @@ function broadcastLobbyList() {
     name: l.name,
     host: l.hostName,
     players: Object.keys(l.members).length,
-    maxPlayers: MAX_LOBBY_PLAYERS,
+    maxPlayers: l.maxPlayers,
     started: l.started,
     expiresIn: Math.max(0, Math.ceil((l.expiresAt - Date.now()) / 1000)),
   }));
@@ -86,20 +86,28 @@ io.on("connection", (socket) => {
       name: l.name,
       host: l.hostName,
       players: Object.keys(l.members).length,
-      maxPlayers: MAX_LOBBY_PLAYERS,
+      maxPlayers: l.maxPlayers,
       started: l.started,
       expiresIn: Math.max(0, Math.ceil((l.expiresAt - Date.now()) / 1000)),
     }));
     socket.emit("lobbyList", list);
   });
 
-  socket.on("createLobby", ({ name, cls, playerName }) => {
+  socket.on("createLobby", ({
+    name,
+    cls,
+    playerName,
+    maxPlayers,
+    gameTime
+  }) => {
     // Clean up any existing lobby this socket is in
     leavePreviousLobby(socket);
 
     const id = makeLobbyId();
     const lobby = {
       id,
+      maxPlayers: maxPlayers || 10,
+      gameTime: gameTime || 900,
       name: playerName ? `${playerName}'s Lobby` : "Sacred Arena",
       hostId: socket.id,
       hostName: playerName || "Host",
@@ -147,7 +155,7 @@ io.on("connection", (socket) => {
       socket.emit("joinFailed", "Lobby not found.");
       return;
     }
-    if (Object.keys(lobby.members).length >= MAX_LOBBY_PLAYERS) {
+    if (Object.keys(lobby.members).length >= lobby.maxPlayers) {
       socket.emit(
         "joinFailed",
         "Lobby is full (max " + MAX_LOBBY_PLAYERS + ").",
@@ -354,6 +362,16 @@ io.on("connection", (socket) => {
     broadcastLobbyList();
   });
 
+  socket.on("leaveLobby", () => {
+    leavePreviousLobby(socket);
+
+    if (players[socket.id]) {
+      delete players[socket.id].lobbyId;
+    }
+
+    broadcastLobbyList();
+  });
+
   socket.on("disconnect", () => {
     const meta = players[socket.id];
     if (meta && meta.lobbyId) {
@@ -389,6 +407,16 @@ function leavePreviousLobby(socket) {
   if (lobby) {
     delete lobby.members[socket.id];
     delete lobby.scores[socket.id];
+
+    const remaining = Object.keys(lobby.members);
+
+    if (remaining.length === 0) {
+      delete lobbies[meta.lobbyId];
+    }
+    else if (lobby.hostId === socket.id) {
+      lobby.hostId = remaining[0];
+      lobby.hostName = lobby.members[remaining[0]]?.name || "Host";
+    }
     if (lobby.hostId === socket.id) {
       const remaining = Object.keys(lobby.members);
       if (remaining.length > 0) {
@@ -400,6 +428,7 @@ function leavePreviousLobby(socket) {
     }
     if (lobbies[meta.lobbyId]) {
       io.to(meta.lobbyId).emit("lobbyState", Object.values(lobby.members));
+      broadcastLobbyList();
     }
   }
   socket.leave(meta.lobbyId);
