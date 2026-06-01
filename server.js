@@ -108,7 +108,7 @@ io.on("connection", (socket) => {
       id,
       maxPlayers: maxPlayers || 10,
       gameTime: gameTime || 900,
-      name: name || (playerName ? `${playerName}'s Lobby` : "Sacred Arena"),
+      name: name || (playerName ? `${playerName}'s Lobbyzz` : "Sacred Arena"),
       hostId: socket.id,
       hostName: playerName || "Host",
       members: {},
