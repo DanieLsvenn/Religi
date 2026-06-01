@@ -982,7 +982,6 @@
       <div class="death-stats" id="death-stats"></div>
       <div class="death-actions">
         <button class="btn" id="btn-spectate">👁 SPECTATE</button>
-        <button class="btn green-btn" id="btn-rejoin-match">↺ REJOIN</button>
         <button class="btn danger" id="btn-leave-match">✕ LEAVE</button>
       </div>
     </div>
@@ -4036,42 +4035,35 @@
           proj.life -= dt;
           proj.x += proj.dx * dt;
           proj.y += proj.dz * dt; // dz from old system maps to y here
-
-          // Remote projectiles are visual-only — each client runs its own combat sim.
-          // Don't let remote shots kill local enemies (would cause double-death desyncs).
-          if (proj.owner !== "remote") {
-            for (const e of GS.enemies) {
-              if (!e.alive) continue;
-              const d2 = (e.x - proj.x) ** 2 + (e.y - proj.y) ** 2;
-              if (d2 < 0.5) {
-                // scale projectile damage if it belongs to the player (apply damageMult and per-ability rank)
-                let actualDamage = proj.damage;
-                if (proj.owner === "player" && GS.player) {
-                  const pp = GS.player;
-                  actualDamage *= pp.damageMult || 1;
-                  if (pp.blessingActive && pp.blessingDamageBuff)
-                    actualDamage *= 1 + pp.blessingDamageBuff;
-                  if (proj.sourceAbility) {
-                    const rank =
-                      (pp.abilityRanks &&
-                        pp.abilityRanks[proj.sourceAbility]) ||
-                      1;
-                    actualDamage *= 1 + 0.2 * (rank - 1);
-                  }
-                  // Crit
-                  if (Math.random() < (pp.critChance || 0.05))
-                    actualDamage *= pp.critMult || 1.5;
+          for (const e of GS.enemies) {
+            if (!e.alive) continue;
+            const d2 = (e.x - proj.x) ** 2 + (e.y - proj.y) ** 2;
+            if (d2 < 0.5) {
+              // scale projectile damage if it belongs to the player (apply damageMult and per-ability rank)
+              let actualDamage = proj.damage;
+              if (proj.owner === "player" && GS.player) {
+                const pp = GS.player;
+                actualDamage *= pp.damageMult || 1;
+                if (pp.blessingActive && pp.blessingDamageBuff)
+                  actualDamage *= 1 + pp.blessingDamageBuff;
+                if (proj.sourceAbility) {
+                  const rank =
+                    (pp.abilityRanks && pp.abilityRanks[proj.sourceAbility]) ||
+                    1;
+                  actualDamage *= 1 + 0.2 * (rank - 1);
                 }
-                hitEnemy(e, actualDamage);
-                spawnParticles(e.x, e.y, proj.color || "#ffffff", 5);
-                if (proj.type !== "beam") {
-                  GS.projectiles.splice(i, 1);
-                  break;
-                }
+                // Crit
+                if (Math.random() < (pp.critChance || 0.05))
+                  actualDamage *= pp.critMult || 1.5;
+              }
+              hitEnemy(e, actualDamage);
+              spawnParticles(e.x, e.y, proj.color || "#ffffff", 5);
+              if (proj.type !== "beam") {
+                GS.projectiles.splice(i, 1);
+                break;
               }
             }
           }
-
           if (
             GS.projectiles[i] &&
             (proj.life <= 0 ||
@@ -5204,17 +5196,12 @@
 
       function spawnSystem(dt) {
         GS.lastSpawnTime += dt;
-        // In multiplayer, count alive remote players too. In solo, ignore netPlayers
-        // so bot count doesn't get inflated by stale remote entries.
-        const remoteAlive =
-          socket && socket.connected
-            ? Object.values(netPlayers || {}).filter((p) => p && !p.dead).length
-            : 0;
+        // Scale spawn rate and count with number of active players
         const activePlayers = Math.max(
           1,
           GS.botPlayers.filter((b) => !b.dead).length +
             (GS.player && !GS.player.dead ? 1 : 0) +
-            remoteAlive,
+            Object.values(netPlayers || {}).filter((p) => !p.dead).length,
         );
         const playerScale = Math.sqrt(activePlayers); // soft scaling
         const interval = Math.max(0.4, (3 - GS.wave * 0.2) / playerScale);
@@ -5269,34 +5256,20 @@
         let tx = CAM.x,
           ty = CAM.y;
         if (GS.spectating) {
-          // Build ordered list of alive remote players to cycle through
-          const aliveRemote = Object.values(netPlayers).filter(
-            (np) => np && !np.dead,
-          );
-          if (aliveRemote.length > 0) {
-            // Clamp index
-            GS.spectatorIndex = Math.max(
-              0,
-              Math.min(GS.spectatorIndex || 0, aliveRemote.length - 1),
-            );
-            const target = aliveRemote[GS.spectatorIndex];
-            tx = target.x;
-            ty = target.y;
-            // Update HUD label
-            const specHud = document.getElementById("spectator-hud");
-            if (specHud) {
-              const icon = target.cls
-                ? CLASSES.find((c) => c.id === target.cls)?.icon || "?"
-                : "?";
-              specHud.innerHTML = `☠ SPECTATING ${icon} ${escapeHtml((target.name || "").substring(0, 10))}
-                <div class="spec-sub">TAB to switch · ${GS.spectatorIndex + 1}/${aliveRemote.length} alive</div>`;
+          // Follow nearest alive remote player when spectating
+          let found = false;
+          for (const id in netPlayers) {
+            const np = netPlayers[id];
+            if (np && !np.dead) {
+              tx = np.x;
+              ty = np.y;
+              found = true;
+              break;
             }
-          } else {
+          }
+          if (!found) {
             tx = 0;
             ty = 0;
-            const specHud = document.getElementById("spectator-hud");
-            if (specHud)
-              specHud.innerHTML = `☠ ALL FALLEN<div class="spec-sub">Match ending...</div>`;
           }
         } else {
           if (!p || p.dead) return;
@@ -5314,20 +5287,7 @@
       // ═══════════════════════════════════════════════════════════════════════
 
       const keys = {};
-      window.addEventListener("keydown", (e) => {
-        keys[e.code] = true;
-        // Tab cycles spectator target
-        if (e.code === "Tab" && GS.spectating) {
-          e.preventDefault();
-          const aliveRemote = Object.values(netPlayers).filter(
-            (np) => np && !np.dead,
-          );
-          if (aliveRemote.length > 0) {
-            GS.spectatorIndex =
-              ((GS.spectatorIndex || 0) + 1) % aliveRemote.length;
-          }
-        }
-      });
+      window.addEventListener("keydown", (e) => (keys[e.code] = true));
       window.addEventListener("keyup", (e) => (keys[e.code] = false));
 
       function getInput() {
@@ -5815,7 +5775,7 @@
       function checkMatchOver() {
         if (!GS.running) return;
         if (GS.player && GS.player.dead) {
-          // In multiplayer, offer spectate/rejoin instead of ending immediately
+          // In multiplayer, offer spectate instead of ending immediately
           if (socket && socket.connected) {
             const ds = document.getElementById("death-stats");
             ds.innerHTML = `
@@ -5823,13 +5783,6 @@
               Score: <span>${GS.score || GS.player.score || 0}</span><br>
               Enemies Defeated: <span>${GS.kills}</span><br>
               Level: <span>${GS.player.level}</span>`;
-            // Show/hide rejoin button based on lobby availability
-            const rejoinBtn = document.getElementById("btn-rejoin-match");
-            if (rejoinBtn) {
-              rejoinBtn.style.display = GS.currentLobbyId
-                ? "inline-block"
-                : "none";
-            }
             document.getElementById("death-modal").classList.remove("hidden");
             // Keep GS.running = true so the world keeps ticking for spectators
           } else {
@@ -5982,7 +5935,6 @@
           lastSpawnTime: 0,
           time: 0,
           spectating: false,
-          spectatorIndex: 0,
           leaderboard: [],
         });
         waveEffects.length = 0;
@@ -6155,34 +6107,17 @@
         });
 
         socket.on("startMatch", (initState) => {
-          // Seed netPlayers from server's initial state (excluding self)
+          // Reset netPlayers and seed with initial state from server (excluding self)
           netPlayers = {};
           if (initState && Array.isArray(initState.playerStates)) {
             for (const p of initState.playerStates) {
               if (p.id !== socket.id) netPlayers[p.id] = p;
             }
           }
-
+          // Guard: don't re-init if match already running (e.g. host's countdown fired first)
           if (!GS.running) {
-            // Fresh match start
             GS.player = createPlayer(GS.selectedClass, GS.playerName);
             startMatch();
-          } else {
-            // Rejoining a match already in progress — respawn player, keep world state
-            GS.player = createPlayer(GS.selectedClass, GS.playerName);
-            GS.player.dead = false;
-            GS.spectating = false;
-            GS.spectatorIndex = 0;
-            document.getElementById("death-modal").classList.add("hidden");
-            document.getElementById("spectator-hud").classList.add("hidden");
-            document.getElementById("hud").classList.remove("hidden");
-            document
-              .getElementById("minimap-canvas")
-              .classList.remove("hidden");
-            document.getElementById("hud-name").textContent =
-              GS.player.cls.icon +
-              " " +
-              (GS.playerName || GS.player.cls.name.toUpperCase());
           }
           startSendingInputs();
         });
@@ -6306,20 +6241,14 @@
         });
 
         socket.on("lobbyExpired", () => {
+          alert(
+            "This arena has expired (15-min limit). Returning to lobby browser.",
+          );
           GS.running = false;
           GS.spectating = false;
           stopSendingInputs();
-          // Show end screen with final leaderboard instead of blocking alert
-          const endScreen = document.getElementById("end-screen");
-          const endTitle = document.getElementById("end-title");
-          endTitle.textContent = "✦ ARENA CLOSED ✦";
-          endTitle.className = "lose";
-          document.getElementById("end-stats").innerHTML =
-            `Arena time limit reached.<br>Check the leaderboard for final scores.`;
-          document
-            .querySelectorAll(".screen")
-            .forEach((s) => s.classList.add("hidden"));
-          endScreen.classList.remove("hidden");
+          showScreen("lobby-browser-screen");
+          if (socket) socket.emit("listLobbies");
         });
 
         socket.on("disconnect", () => {
@@ -6460,28 +6389,10 @@
           .addEventListener("click", () => {
             document.getElementById("death-modal").classList.add("hidden");
             GS.spectating = true;
-            GS.spectatorIndex = 0;
             document.getElementById("spectator-hud").classList.remove("hidden");
             document
               .getElementById("leaderboard-panel")
               .classList.remove("hidden");
-          });
-
-        document
-          .getElementById("btn-rejoin-match")
-          .addEventListener("click", () => {
-            // Only available in multiplayer
-            if (!socket || !socket.connected || !GS.currentLobbyId) return;
-            document.getElementById("death-modal").classList.add("hidden");
-            GS.spectating = false;
-            document.getElementById("spectator-hud").classList.add("hidden");
-            // Tell server we're rejoining — server freed our slot on playerDead
-            socket.emit("joinLobby", {
-              lobbyId: GS.currentLobbyId,
-              cls: GS.selectedClass,
-              playerName: GS.playerName,
-            });
-            // startMatch event from server will re-init the player
           });
 
         document

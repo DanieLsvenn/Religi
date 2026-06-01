@@ -19,9 +19,7 @@ app.get("/", (req, res) => res.sendFile(path.join(__dirname, "game.html")));
 const MAX_LOBBY_PLAYERS = 10;
 const TICK_RATE = 20;
 const DT = 1 / TICK_RATE;
-const LOBBY_LIFETIME_MS = 15 * 60 * 1000; // 15 min active match
-const POST_GAME_GRACE_MS = 5 * 60 * 1000; // 5 min after match ends for leaderboard viewing
-const LOBBY_IDLE_MS = 30 * 60 * 1000; // 30 min max idle before match (waiting room)
+const LOBBY_LIFETIME_MS = 15 * 60 * 1000; // 15 minutes
 
 // World bounds matching the client exactly:
 // ARENA_WIDTH=6792, ARENA_HEIGHT=3704, WORLD_SCALE=38
@@ -108,7 +106,7 @@ io.on("connection", (socket) => {
       members: {},
       scores: {},
       started: false,
-      expiresAt: Date.now() + LOBBY_IDLE_MS, // waiting room: 30 min to fill up
+      expiresAt: Date.now() + LOBBY_LIFETIME_MS,
     };
 
     const p = {
@@ -149,7 +147,6 @@ io.on("connection", (socket) => {
       socket.emit("joinFailed", "Lobby not found.");
       return;
     }
-    // Count only active members (dead players are removed from members already)
     if (Object.keys(lobby.members).length >= MAX_LOBBY_PLAYERS) {
       socket.emit(
         "joinFailed",
@@ -174,22 +171,14 @@ io.on("connection", (socket) => {
       dead: false,
     };
     lobby.members[socket.id] = p;
-
-    // Restore or create score entry (player may be rejoining after death)
-    if (!lobby.scores[socket.id]) {
-      lobby.scores[socket.id] = {
-        id: socket.id,
-        name: p.name,
-        cls: p.cls,
-        score: 0,
-        wave: 1,
-        dead: false,
-      };
-    } else {
-      // Rejoin: mark them alive again in scores
-      lobby.scores[socket.id].dead = false;
-    }
-
+    lobby.scores[socket.id] = {
+      id: socket.id,
+      name: p.name,
+      cls: p.cls,
+      score: 0,
+      wave: 1,
+      dead: false,
+    };
     players[socket.id] = { ...p, lobbyId };
 
     socket.join(lobbyId);
@@ -197,7 +186,7 @@ io.on("connection", (socket) => {
     broadcastLobbyList();
     broadcastLeaderboard(lobby);
 
-    // If match already started, send startMatch immediately so rejoining player drops in
+    // If match already started, send startMatch immediately so late/returning player can rejoin
     if (lobby.started) {
       socket.emit("startMatch", { playerStates: Object.values(lobby.members) });
     }
@@ -328,8 +317,8 @@ io.on("connection", (socket) => {
     const lobby = lobbies[meta.lobbyId];
     if (!lobby) return;
 
-    // Preserve score entry but remove from active members so the slot is freed.
-    // This lets the player rejoin the same lobby without crowding it.
+    // Mark dead in members and scores
+    if (lobby.members[socket.id]) lobby.members[socket.id].dead = true;
     const entry = lobby.scores[socket.id];
     if (entry) {
       entry.dead = true;
@@ -337,18 +326,8 @@ io.on("connection", (socket) => {
       entry.wave = wave || entry.wave;
     }
 
-    // Remove from members so player count drops and they can rejoin
-    delete lobby.members[socket.id];
-    // If they were the host, hand off
-    if (lobby.hostId === socket.id) {
-      const remaining = Object.keys(lobby.members);
-      if (remaining.length > 0) {
-        lobby.hostId = remaining[0];
-        lobby.hostName = lobby.members[remaining[0]]?.name || "Host";
-      }
-    }
-
     const lb = buildLeaderboard(lobby);
+    // Tell entire lobby: a player died (for grave + leaderboard update)
     io.to(lobby.id).emit("playerDied", {
       id: socket.id,
       x: x || 0,
@@ -358,10 +337,7 @@ io.on("connection", (socket) => {
       score: score || 0,
       leaderboard: lb,
     });
-    io.to(lobby.id).emit("lobbyState", Object.values(lobby.members));
     broadcastLeaderboard(lobby);
-    broadcastLobbyList();
-    console.log("Player died and freed slot:", meta.name, "in lobby", lobby.id);
   });
 
   socket.on("startNow", () => {
@@ -372,8 +348,6 @@ io.on("connection", (socket) => {
     // Only the host can force-start
     if (lobby.hostId !== socket.id) return;
     lobby.started = true;
-    // Reset expiry: 15 min match + 5 min post-game grace
-    lobby.expiresAt = Date.now() + LOBBY_LIFETIME_MS + POST_GAME_GRACE_MS;
     io.to(lobby.id).emit("startMatch", {
       playerStates: Object.values(lobby.members),
     });
