@@ -108,7 +108,7 @@ io.on("connection", (socket) => {
       id,
       maxPlayers: maxPlayers || 10,
       gameTime: gameTime || 900,
-      name: name || (playerName ? `${playerName}'s Lobbyzz` : "Sacred Arena"),
+      name: name || (playerName ? `${playerName}'s Lobby` : "Sacred Arena"),
       hostId: socket.id,
       hostName: playerName || "Host",
       members: {},
@@ -226,6 +226,26 @@ io.on("connection", (socket) => {
     socket.emit("needLobby");
   });
 
+  // FIX REJOIN LATER!!!!!
+  // FIX REJOIN LATER!!!!!
+  // FIX REJOIN LATER!!!!!
+  // FIX REJOIN LATER!!!!!
+  // FIX REJOIN LATER!!!!!
+  // FIX REJOIN LATER!!!!!
+  // FIX REJOIN LATER!!!!!
+  // FIX REJOIN LATER!!!!!
+  // FIX REJOIN LATER!!!!!
+  // FIX REJOIN LATER!!!!!
+  // FIX REJOIN LATER!!!!!
+  // FIX REJOIN LATER!!!!!
+  // FIX REJOIN LATER!!!!!
+  // FIX REJOIN LATER!!!!!
+  // FIX REJOIN LATER!!!!!
+  // FIX REJOIN LATER!!!!!
+  // FIX REJOIN LATER!!!!!
+  // FIX REJOIN LATER!!!!!
+  // FIX REJOIN LATER!!!!!
+  // FIX REJOIN LATER!!!!!
   socket.on("rejoin", ({ cls, playerName } = {}) => {
     const meta = players[socket.id];
     if (!meta || !meta.lobbyId) return;

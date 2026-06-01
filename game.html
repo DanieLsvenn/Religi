@@ -6219,7 +6219,8 @@
         GS.currentLobbyId = lobbyId;
         GS.isHost = true;
         document.getElementById("lobby-info").textContent =
-          "Arena ID: " + lobbyId + " \u00b7 Share this with friends!";
+          // "Arena ID: " + lobbyId + " \u00b7 Share this with friends!";
+          "You are the host, you can start any time!"
         showScreen("lobby-screen");
       });
 
@@ -6266,8 +6267,10 @@
       socket.on("lobbyState", (playersList) => {
         const grid = document.getElementById("lobby-grid");
         grid.innerHTML = "";
-        GS.isHost = members.length &&
-          members[0].id === socket.id;
+        GS.isHost =
+          playersList &&
+          playersList.length > 0 &&
+          playersList[0].id === socket.id;
         for (let i = 0; i < 10; i++) {
           const p = (playersList && playersList[i]) || null;
           const slot = document.createElement("div");
@@ -6558,23 +6561,15 @@
       document
         .getElementById("btn-create-lobby")
         .addEventListener("click", () => {
-          if (!socket) {
-            initSocket(() => {
-              socket.emit("createLobby", {
-                name: document.getElementById("room-name").value.trim() || GS.playerName + "'s Lobby",
-                cls: GS.selectedClass,
-                playerName: GS.playerName,
-                maxPlayers: Number(document.getElementById("room-max-players").value) || 10,
-                gameTime: Number(document.getElementById("room-time").value) || 900,
-              });
-            });
-          } else {
+          initSocket(() => {
             socket.emit("createLobby", {
-              name: GS.playerName + "'s Lobbyz",
+              name: document.getElementById("room-name").value.trim() || GS.playerName + "'s Lobby",
               cls: GS.selectedClass,
               playerName: GS.playerName,
+              maxPlayers: Number(document.getElementById("room-max-players").value) || 10,
+              gameTime: Number(document.getElementById("room-time").value) || 900,
             });
-          }
+          });
         });
 
       document
