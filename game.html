@@ -6264,7 +6264,8 @@
         }
       });
 
-      socket.on("lobbyState", (playersList) => {
+      socket.on("lobbyState", (data) => {
+        const playersList = data.players || [];
         const maxPlayers = data.maxPlayers || 10;
 
         const grid = document.getElementById("lobby-grid");
