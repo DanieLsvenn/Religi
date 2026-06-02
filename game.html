@@ -2685,6 +2685,7 @@
       playerName: "", // set from name prompt
       spectatorTarget: null, // world coords to follow when spectating
       currentLobbyId: null, // active lobby id for rejoining
+      isHost: false,
     };
 
     let lastTimestamp = 0;
@@ -6258,6 +6259,7 @@
               });
               GS.currentLobbyId = l.id;
               showScreen("lobby-screen");
+              console.log("isHost: " + GS.isHost);
             });
           }
           container.appendChild(div);
