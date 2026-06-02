@@ -144,7 +144,13 @@ io.on("connection", (socket) => {
 
     socket.join(id);
     socket.emit("lobbyCreated", { lobbyId: id });
-    socket.emit("lobbyState", Object.values(lobby.members));
+    socket.emit("lobbyState",
+      {
+        players: Object.values(lobby.members),
+        maxPlayers: lobby.maxPlayers,
+        hostId: lobby.hostId
+      }
+    );
     broadcastLobbyList();
     console.log("Lobby created:", id, "by", p.name);
   });
@@ -190,7 +196,13 @@ io.on("connection", (socket) => {
     players[socket.id] = { ...p, lobbyId };
 
     socket.join(lobbyId);
-    io.to(lobbyId).emit("lobbyState", Object.values(lobby.members));
+    io.to(lobbyId).emit("lobbyState",
+      {
+        players: Object.values(lobby.members),
+        maxPlayers: lobby.maxPlayers,
+        hostId: lobby.hostId
+      }
+    );
     broadcastLobbyList();
     broadcastLeaderboard(lobby);
 
@@ -215,9 +227,12 @@ io.on("connection", (socket) => {
       if (lobby && lobby.members[socket.id]) {
         lobby.members[socket.id].cls = cls || lobby.members[socket.id].cls;
         lobby.members[socket.id].name = name || lobby.members[socket.id].name;
-        io.to(existing.lobbyId).emit(
-          "lobbyState",
-          Object.values(lobby.members),
+        io.to(existing.lobbyId).emit("lobbyState",
+          {
+            players: Object.values(lobby.members),
+            maxPlayers: lobby.maxPlayers,
+            hostId: lobby.hostId
+          }
         );
         return;
       }
@@ -261,7 +276,13 @@ io.on("connection", (socket) => {
     }
     // Re-join the socket room (in case they reconnected)
     socket.join(meta.lobbyId);
-    socket.emit("lobbyState", Object.values(lobby.members));
+    socket.emit("lobbyState",
+      {
+        players: Object.values(lobby.members),
+        maxPlayers: lobby.maxPlayers,
+        hostId: lobby.hostId
+      }
+    );
     if (lobby.started) {
       socket.emit("startMatch", { playerStates: Object.values(lobby.members) });
     }
@@ -274,7 +295,13 @@ io.on("connection", (socket) => {
     const lobby = meta.lobbyId ? lobbies[meta.lobbyId] : null;
     if (lobby && lobby.members[socket.id]) {
       lobby.members[socket.id].cls = cls;
-      io.to(lobby.id).emit("lobbyState", Object.values(lobby.members));
+      io.to(lobby.id).emit("lobbyState",
+        {
+          players: Object.values(lobby.members),
+          maxPlayers: lobby.maxPlayers,
+          hostId: lobby.hostId
+        }
+      );
       // Notify other players to update this player's sprite
       socket.to(lobby.id).emit("playerClassChanged", { id: socket.id, cls });
     }
@@ -410,7 +437,13 @@ io.on("connection", (socket) => {
           }
         }
         if (lobbies[meta.lobbyId]) {
-          io.to(meta.lobbyId).emit("lobbyState", Object.values(lobby.members));
+          io.to(meta.lobbyId).emit("lobbyState",
+            {
+              players: Object.values(lobby.members),
+              maxPlayers: lobby.maxPlayers,
+              hostId: lobby.hostId
+            }
+          );
         }
       }
     }
@@ -448,7 +481,13 @@ function leavePreviousLobby(socket) {
       }
     }
     if (lobbies[meta.lobbyId]) {
-      io.to(meta.lobbyId).emit("lobbyState", Object.values(lobby.members));
+      io.to(meta.lobbyId).emit("lobbyState",
+        {
+          players: Object.values(lobby.members),
+          maxPlayers: lobby.maxPlayers,
+          hostId: lobby.hostId
+        }
+      );
       broadcastLobbyList();
     }
   }

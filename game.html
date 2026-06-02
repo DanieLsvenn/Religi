@@ -6265,13 +6265,15 @@
       });
 
       socket.on("lobbyState", (playersList) => {
+        const maxPlayers = data.maxPlayers || 10;
+
         const grid = document.getElementById("lobby-grid");
         grid.innerHTML = "";
         GS.isHost =
           playersList &&
           playersList.length > 0 &&
           playersList[0].id === socket.id;
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < maxPlayers; i++) {
           const p = (playersList && playersList[i]) || null;
           const slot = document.createElement("div");
           if (p) {
@@ -6647,7 +6649,7 @@
 
           netPlayers = {};
 
-          showScreen("class-screen");
+          showScreen("lobby-browser-screen");
 
           if (socket) {
             socket.emit("listLobbies");
