@@ -60,6 +60,42 @@ function broadcastLobbyList() {
   io.emit("lobbyList", list);
 }
 
+function broadcastMatchTimers() {
+  const now = Date.now();
+
+  for (const id in lobbies) {
+    const lobby = lobbies[id];
+
+    if (
+      !lobby.started ||
+      !lobby.matchEndAt
+    )
+      continue;
+
+    const remaining = Math.max(
+      0,
+      Math.ceil(
+        (lobby.matchEndAt - now) / 1000
+      )
+    );
+
+    io.to(id).emit(
+      "matchTimer",
+      remaining
+    );
+
+    if (remaining <= 0) {
+      lobby.started = false;
+
+      io.to(id).emit("matchEnded");
+
+      broadcastLobbyList();
+    }
+  }
+}
+
+setInterval(broadcastMatchTimers, 500);
+
 // Expire lobbies after 15 minutes
 function cleanupLobbies() {
   const now = Date.now();
@@ -72,7 +108,7 @@ function cleanupLobbies() {
   }
   broadcastLobbyList();
 }
-setInterval(cleanupLobbies, 1000);
+setInterval(cleanupLobbies, 500);
 
 // ─── Socket handling ──────────────────────────────────────────────────────────
 io.on("connection", (socket) => {
@@ -114,6 +150,7 @@ io.on("connection", (socket) => {
       members: {},
       scores: {},
       started: false,
+      matchEndAt: null,
       expiresAt: Date.now() + LOBBY_LIFETIME_MS,
     };
 
@@ -390,6 +427,10 @@ io.on("connection", (socket) => {
     // Only the host can force-start
     if (lobby.hostId !== socket.id) return;
     lobby.started = true;
+
+    lobby.matchEndAt =
+      Date.now() + lobby.gameTime * 1000;
+
     io.to(lobby.id).emit("startMatch", {
       playerStates: Object.values(lobby.members),
       gameTime: lobby.gameTime,

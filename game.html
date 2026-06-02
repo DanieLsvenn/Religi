@@ -2663,6 +2663,7 @@
       paused: false,
       matchTime: 15 * 60,
       elapsed: 0,
+      serverRemainingTime: 15 * 60,
       wave: 1,
       player: null,
       enemies: [],
@@ -3843,11 +3844,7 @@
     // ═══════════════════════════════════════════════════════════════════════
 
     function updateTimer(dt) {
-      const remaining = Math.max(0, GS.matchTime - GS.elapsed);
-      if (remaining <= 0 && GS.running) {
-        endMatch(true);
-        return;
-      }
+      const remaining = GS.serverRemainingTime;
       const wave = Math.floor(GS.elapsed / 60) + 1;
       if (wave !== GS.wave) {
         GS.wave = wave;
@@ -5511,7 +5508,7 @@
     function updateHUD() {
       const p = GS.player;
       if (!p) return;
-      const remaining = Math.max(0, GS.matchTime - GS.elapsed);
+      const remaining = GS.serverRemainingTime;
       const mins = Math.floor(remaining / 60)
         .toString()
         .padStart(2, "0");
@@ -6332,6 +6329,10 @@
           startMatch();
         }
         startSendingInputs();
+      });
+
+      socket.on("matchTimer", (remaining) => {
+        GS.serverRemainingTime = remaining;
       });
 
       socket.on("state", (playersArray) => {
