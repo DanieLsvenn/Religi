@@ -72,7 +72,7 @@ function cleanupLobbies() {
   }
   broadcastLobbyList();
 }
-setInterval(cleanupLobbies, 10000);
+setInterval(cleanupLobbies, 1000);
 
 // ─── Socket handling ──────────────────────────────────────────────────────────
 io.on("connection", (socket) => {
@@ -157,10 +157,20 @@ io.on("connection", (socket) => {
 
   socket.on("joinLobby", ({ lobbyId, name, cls, playerName }) => {
     const lobby = lobbies[lobbyId];
+
     if (!lobby) {
       socket.emit("joinFailed", "Lobby not found.");
       return;
     }
+
+    if (lobby.started) {
+      socket.emit(
+        "joinFailed",
+        "Game already in progress."
+      );
+      return;
+    }
+
     if (Object.keys(lobby.members).length >= lobby.maxPlayers) {
       socket.emit(
         "joinFailed",

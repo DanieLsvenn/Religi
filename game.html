@@ -6235,7 +6235,7 @@
         }
         container.innerHTML = "";
         for (const l of list) {
-          const full = l.players >= l.maxPlayers;
+          const full = l.players >= l.maxPlayers || l.started;
           const div = document.createElement("div");
           div.className =
             "lobby-entry" +
@@ -6246,10 +6246,23 @@
                 <div class="le-name">${escapeHtml(l.name)}</div>
                 <div class="le-meta">Host: ${escapeHtml(l.host)} \u00b7 ID: ${l.id}${l.started ? " \u00b7 IN PROGRESS" : ""}</div>
               </div>
-              <div>
-                <div class="le-players">${l.players}/${l.maxPlayers}</div>
-                <div class="le-expires">\u23f1 ${Math.floor(l.expiresIn / 60)}m ${l.expiresIn % 60}s left</div>
-              </div>`;
+              ${l.started
+              ? `
+      <div class="le-players">
+        Game On-going
+      </div>
+    `
+              : `
+      <div class="le-players">
+        ${l.players}/${l.maxPlayers}
+      </div>
+
+      <div class="le-expires">
+        ${Math.floor(l.expiresIn / 60)}m
+        ${l.expiresIn % 60}s left
+      </div>
+    `
+            }`;
           if (!full) {
             div.addEventListener("click", () => {
               socket.emit("joinLobby", {
@@ -6441,7 +6454,7 @@
 
       socket.on("lobbyExpired", () => {
         alert(
-          "This arena has expired (15-min limit). Returning to lobby browser.",
+          "This arena has expired. Returning to lobby browser.",
         );
         GS.running = false;
         GS.spectating = false;
