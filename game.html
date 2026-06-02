@@ -6272,10 +6272,21 @@
 
         const grid = document.getElementById("lobby-grid");
         grid.innerHTML = "";
-        GS.isHost =
-          playersList &&
-          playersList.length > 0 &&
-          playersList[0].id === socket.id;
+        GS.isHost = data.hostId === socket.id;
+
+        const lobbyInfo = document.getElementById("lobby-info");
+
+        if (GS.isHost) {
+          lobbyInfo.textContent =
+            "You are the host, you can start any time!";
+        } else {
+          lobbyInfo.textContent =
+            "Waiting for host to start the game...";
+        }
+
+        document.getElementById("btn-start-now").style.display =
+          GS.isHost ? "inline-flex" : "none";
+
         for (let i = 0; i < maxPlayers; i++) {
           const p = (playersList && playersList[i]) || null;
           const slot = document.createElement("div");
@@ -6648,6 +6659,8 @@
 
           if (socket) {
             socket.emit("leaveLobby");
+            GS.isHost = false;
+            document.getElementById("btn-start-now").style.display = "none";
           }
 
           netPlayers = {};

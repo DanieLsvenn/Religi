@@ -218,29 +218,6 @@ io.on("connection", (socket) => {
     );
   });
 
-  // Legacy join for backwards compatibility
-  socket.on("join", ({ name, cls }) => {
-    // If they're already in a lobby, just update their info
-    const existing = players[socket.id];
-    if (existing && existing.lobbyId) {
-      const lobby = lobbies[existing.lobbyId];
-      if (lobby && lobby.members[socket.id]) {
-        lobby.members[socket.id].cls = cls || lobby.members[socket.id].cls;
-        lobby.members[socket.id].name = name || lobby.members[socket.id].name;
-        io.to(existing.lobbyId).emit("lobbyState",
-          {
-            players: Object.values(lobby.members),
-            maxPlayers: lobby.maxPlayers,
-            hostId: lobby.hostId
-          }
-        );
-        return;
-      }
-    }
-    // Otherwise, auto-create a lobby
-    socket.emit("needLobby");
-  });
-
   // FIX REJOIN LATER!!!!!
   // FIX REJOIN LATER!!!!!
   // FIX REJOIN LATER!!!!!
@@ -421,35 +398,17 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    const meta = players[socket.id];
-    if (meta && meta.lobbyId) {
-      const lobby = lobbies[meta.lobbyId];
-      if (lobby) {
-        delete lobby.members[socket.id];
-        // If host left and lobby has members, assign a new host
-        if (lobby.hostId === socket.id) {
-          const remaining = Object.keys(lobby.members);
-          if (remaining.length > 0) {
-            lobby.hostId = remaining[0];
-            lobby.hostName = lobby.members[remaining[0]]?.name || "Host";
-          } else {
-            delete lobbies[meta.lobbyId];
-          }
-        }
-        if (lobbies[meta.lobbyId]) {
-          io.to(meta.lobbyId).emit("lobbyState",
-            {
-              players: Object.values(lobby.members),
-              maxPlayers: lobby.maxPlayers,
-              hostId: lobby.hostId
-            }
-          );
-        }
-      }
-    }
+    leavePreviousLobby(socket);
+
     delete players[socket.id];
+
     broadcastLobbyList();
-    console.log("disconnect", socket.id, Object.keys(players).length);
+
+    console.log(
+      "disconnect",
+      socket.id,
+      Object.keys(players).length
+    );
   });
 });
 
@@ -469,16 +428,8 @@ function leavePreviousLobby(socket) {
     }
     else if (lobby.hostId === socket.id) {
       lobby.hostId = remaining[0];
-      lobby.hostName = lobby.members[remaining[0]]?.name || "Host";
-    }
-    if (lobby.hostId === socket.id) {
-      const remaining = Object.keys(lobby.members);
-      if (remaining.length > 0) {
-        lobby.hostId = remaining[0];
-        lobby.hostName = lobby.members[remaining[0]]?.name || "Host";
-      } else {
-        delete lobbies[meta.lobbyId];
-      }
+      lobby.hostName =
+        lobby.members[remaining[0]]?.name || "Host";
     }
     if (lobbies[meta.lobbyId]) {
       io.to(meta.lobbyId).emit("lobbyState",
