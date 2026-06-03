@@ -458,6 +458,17 @@ io.on("connection", (socket) => {
       leaderboard: lb,
     });
     broadcastLeaderboard(lobby);
+
+    // Check if all players in the lobby are dead — if so, end the match
+    if (lobby.started) {
+      const allDead = Object.values(lobby.members).every(m => m.dead);
+      if (allDead) {
+        io.to(lobby.id).emit("matchEnded");
+        delete lobbies[lobby.id];
+        broadcastLobbyList();
+        console.log("All players dead — lobby removed:", lobby.id);
+      }
+    }
   });
 
   // ── Match control ──────────────────────────────────────────────────────────
