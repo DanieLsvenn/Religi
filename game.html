@@ -1992,9 +1992,9 @@
       {
         id: "shadow",
         name: "Shadow",
-        hp: 30,
+        hp: 20,
         spd: 1.6,
-        dmg: 8,
+        dmg: 4,
         xp: 5,
         points: 10,
         size: 18,
@@ -2003,9 +2003,9 @@
       {
         id: "wraith",
         name: "Wraith",
-        hp: 60,
+        hp: 40,
         spd: 1.2,
-        dmg: 15,
+        dmg: 10,
         xp: 10,
         points: 20,
         size: 22,
@@ -2014,9 +2014,9 @@
       {
         id: "golem",
         name: "Golem",
-        hp: 200,
+        hp: 150,
         spd: 0.6,
-        dmg: 25,
+        dmg: 15,
         xp: 20,
         points: 60,
         size: 28,
@@ -2025,9 +2025,9 @@
       {
         id: "specter",
         name: "Specter",
-        hp: 40,
-        spd: 2.4,
-        dmg: 10,
+        hp: 25,
+        spd: 2.0,
+        dmg: 5,
         xp: 8,
         points: 12,
         size: 16,
@@ -2036,7 +2036,7 @@
       {
         id: "demon",
         name: "Demon",
-        hp: 150,
+        hp: 120,
         spd: 1.0,
         dmg: 30,
         xp: 25,
@@ -2748,6 +2748,7 @@
       playerName: "",
       currentLobbyId: null,
       isHost: false,
+      answeredTrivia: new Set(),
     };
 
     let lastTimestamp = 0;
@@ -4402,22 +4403,24 @@
         player.xpNeeded = Math.floor(player.xpNeeded * 1.4);
         player.level++;
         const lvl = player.level;
-        // Every 5 levels: innate scales automatically (no choice) + milestone ability choice
-        // Every non-5-multiple level: stat choice
-        if (lvl % 5 === 0) {
-          // Auto-scale innate (silent)
-          const innateId = player.cls && player.cls.innateAbility;
-          if (innateId) {
-            player.abilityRanks[innateId] =
-              (player.abilityRanks[innateId] || 1) + 1;
-          }
-          addFloatText(
-            player.x,
-            player.y - 1.5,
-            "INNATE UPGRADED!",
-            "#ffffaa",
-          );
-          // Also give a milestone ability choice
+
+        // Auto-scale innate every level
+        const innateId = player.cls && player.cls.innateAbility;
+        if (innateId) {
+          player.abilityRanks[innateId] =
+            (player.abilityRanks[innateId] || 1) + 1;
+        }
+
+        addFloatText(
+          player.x,
+          player.y - 1.5,
+          "INNATE UPGRADED!",
+          "#ffffaa",
+        );
+
+        // Odd levels = stat choice
+        // Even levels = ability quiz
+        if (lvl % 2 === 0) {
           GS.levelUpQueue.push({ type: "ability", level: lvl });
         } else {
           GS.levelUpQueue.push({ type: "stat", level: lvl });
@@ -5953,7 +5956,20 @@
         if (!def) continue;
         const tradition = player.cls.religion.toLowerCase();
         const triviaBank = TRIVIA[tradition] || TRIVIA.christianity;
-        const q = triviaBank[Math.floor(Math.random() * triviaBank.length)];
+        let availableQuestions = triviaBank.filter(
+          (q) => !GS.answeredTrivia.has(q.q)
+        );
+
+        if (availableQuestions.length === 0) {
+          availableQuestions = triviaBank; // fallback if all questions have been used
+        }
+
+        const q =
+          availableQuestions[
+          Math.floor(Math.random() * availableQuestions.length)
+          ];
+
+        GS.answeredTrivia.add(q.q);
 
         const card = document.createElement("div");
         card.className = "ability-card";
