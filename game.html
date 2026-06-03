@@ -6011,8 +6011,8 @@
 
     function endMatch(survived) {
       GS.running = false;
-      const endScreen = document.getElementById("end-screen");
-      endScreen.classList.remove("hidden");
+      document.getElementById("levelup-modal").classList.add("hidden");
+      document.getElementById("end-screen").classList.remove("hidden");
       const title = document.getElementById("end-title");
       if (survived) {
         title.textContent = "✦ YOU SURVIVED ✦";
