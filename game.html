@@ -5703,7 +5703,27 @@
           slot.className = "ability-slot active";
           slot.style.borderColor = "#ffd700";
           const iRankDisp = (p.abilityRanks && p.abilityRanks[innateId]) || 1;
-          slot.innerHTML = `<span>${def.icon}</span><span class="akey" style="color:#ffd700">Lv${iRankDisp}</span>`;
+          slot.innerHTML = `
+  <span>${def.icon}</span>
+  <span class="akey" style="color:#ffd700">${def.name.substring(0, 5)}</span>
+`;
+
+          slot.addEventListener("mouseenter", () => {
+            let ov = slot.querySelector(".sl-overlay");
+
+            if (!ov) {
+              ov = document.createElement("div");
+              ov.className = "sl-overlay";
+              slot.appendChild(ov);
+            }
+
+            ov.textContent = `Lvl ${iRankDisp}`;
+          });
+
+          slot.addEventListener("mouseleave", () => {
+            const ov = slot.querySelector(".sl-overlay");
+            if (ov) ov.remove();
+          });
           const iCd = Math.max(0, p.innateTimer || 0);
           if (iCd > 0.05) {
             const ov = document.createElement("div");
@@ -5720,7 +5740,13 @@
           const slot = document.createElement("div");
           slot.className = "ability-slot active";
           const rank = (p.abilityRanks && p.abilityRanks[ab]) || 1;
-          slot.innerHTML = `<span>${def.icon}</span><span class="akey">${def.name.substring(0, 5)}</span>`;
+
+          slot.innerHTML = `
+  <span>${def.icon}</span>
+  <span class="akey">${def.name.substring(0, 5)}</span>
+`;
+          const rankStr = rank > 1 ? ` R${rank}` : "";
+          slot.innerHTML = `<span>${def.icon}</span><span class="akey">${def.name.substring(0, 5)}${rankStr}</span>`;
           const cd = p.abilityCooldowns[ab] || 0;
           if (cd > 0) {
             const ov = document.createElement("div");
