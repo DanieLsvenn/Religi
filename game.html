@@ -1030,6 +1030,7 @@
       color: var(--gold);
       font-size: 14px;
     }
+
     .hud-player-row.hud-lb-you {
       color: var(--gold);
     }
@@ -1043,18 +1044,41 @@
       border-bottom: 1px solid #1a1a28;
       font-size: 8px;
     }
+
     .conclusion-row.conclusion-you {
       color: var(--gold);
-      background: rgba(240,192,64,0.06);
+      background: rgba(240, 192, 64, 0.06);
     }
+
     .conclusion-row.conclusion-dead .conclusion-name {
       text-decoration: line-through;
       opacity: 0.5;
     }
-    .conclusion-rank { width: 28px; text-align: center; font-size: 12px; }
-    .conclusion-icon { width: 18px; text-align: center; font-size: 14px; }
-    .conclusion-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .conclusion-score { color: var(--teal); text-align: right; min-width: 60px; }
+
+    .conclusion-rank {
+      width: 28px;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .conclusion-icon {
+      width: 18px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .conclusion-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .conclusion-score {
+      color: var(--teal);
+      text-align: right;
+      min-width: 60px;
+    }
   </style>
 </head>
 
@@ -1221,13 +1245,13 @@
     <div class="spec-sub">You have fallen — watching the battle unfold</div>
   </div>
 
-  <!-- DEATH MODAL -->
+  <!-- DEATH MODAL -->btn-leave-match
   <div id="death-modal" class="hidden">
     <h2>✦ YOU HAVE FALLEN ✦</h2>
     <div class="death-stats" id="death-stats"></div>
     <div class="death-actions">
       <button class="btn" id="btn-spectate">👁 SPECTATE</button>
-      <!--<button class="btn danger" id="btn-leave-match">✕ LEAVE</button>-->
+      <!--<button class="btn danger" id="">✕ LEAVE</button>-->
     </div>
   </div>
 
@@ -1252,11 +1276,14 @@
   </div>
 
   <!-- CONCLUSION SCREEN -->
-  <div class="screen hidden" id="conclusion-screen" style="background:radial-gradient(ellipse at 50% 50%, #1a0a0a 0%, #0a0a0f 70%); gap:16px; z-index:300;">
+  <div class="screen hidden" id="conclusion-screen"
+    style="background:radial-gradient(ellipse at 50% 50%, #1a0a0a 0%, #0a0a0f 70%); gap:16px; z-index:300;">
     <h2 id="conclusion-title" style="font-size:20px;">GAME OVER</h2>
     <div id="conclusion-personal-stats" style="font-size:8px;color:var(--text);line-height:2;text-align:center;"></div>
     <div style="font-size:9px;color:var(--gold);margin-bottom:4px;letter-spacing:2px;">★ FINAL RANKINGS ★</div>
-    <div id="conclusion-leaderboard" style="width:480px;max-height:320px;overflow-y:auto;background:rgba(6,6,14,0.95);border:2px solid var(--border);padding:8px;"></div>
+    <div id="conclusion-leaderboard"
+      style="width:480px;max-height:320px;overflow-y:auto;background:rgba(6,6,14,0.95);border:2px solid var(--border);padding:8px;">
+    </div>
     <div style="display:flex;gap:16px;margin-top:12px;">
       <button class="btn" id="btn-play-again">► PLAY AGAIN</button>
       <button class="btn" id="btn-back-to-menu">◄ MENU</button>
@@ -5608,14 +5635,14 @@
           const icon = entry.icon || getClassIcon(entry.cls);
           const row = document.createElement("div");
           row.className = "hud-player-row" + (entry.dead ? " dead" : "") + (isSelf ? " hud-lb-you" : "");
-          row.innerHTML = `<span style="color:var(--dim);min-width:12px;font-size:6px">${i+1}</span><div class="pip" style="background:${isSelf ? 'var(--gold)' : '#aaa'}"></div><span style="flex:1">${icon} ${escapeHtml((entry.name||"?").substring(0,8))}</span><span style="color:var(--teal);font-size:6px">${entry.score||0}</span>`;
+          row.innerHTML = `<span style="color:var(--dim);min-width:12px;font-size:6px">${i + 1}</span><div class="pip" style="background:${isSelf ? 'var(--gold)' : '#aaa'}"></div><span style="flex:1">${icon} ${escapeHtml((entry.name || "?").substring(0, 8))}</span><span style="color:var(--teal);font-size:6px">${entry.score || 0}</span>`;
           pList.appendChild(row);
         });
       } else {
         // Solo: show player + bots
         const row0 = document.createElement("div");
         row0.className = "hud-player-row" + (p.dead ? " dead" : "") + " hud-lb-you";
-        row0.innerHTML = `<span style="color:var(--dim);min-width:12px;font-size:6px">1</span><div class="pip" style="background:${p.cls.color}"></div><span style="flex:1">${p.cls.icon} YOU Lv${p.level}</span><span style="color:var(--teal);font-size:6px">${p.score||0}</span>`;
+        row0.innerHTML = `<span style="color:var(--dim);min-width:12px;font-size:6px">1</span><div class="pip" style="background:${p.cls.color}"></div><span style="flex:1">${p.cls.icon} YOU Lv${p.level}</span><span style="color:var(--teal);font-size:6px">${p.score || 0}</span>`;
         pList.appendChild(row0);
         for (const b of GS.botPlayers.slice(0, 5)) {
           const row = document.createElement("div");
@@ -6755,7 +6782,7 @@
             .classList.remove("hidden");
         });
 
-      document
+      /*document
         .getElementById("btn-leave-match")
         .addEventListener("click", () => {
           document.getElementById("death-modal").classList.add("hidden");
@@ -6764,7 +6791,7 @@
           document.getElementById("spectator-hud").classList.add("hidden");
           stopSendingInputs();
           showScreen("title-screen");
-        });
+        });*/
 
       document
         .getElementById("btn-back-to-menu")
