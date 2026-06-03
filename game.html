@@ -6350,6 +6350,18 @@
         GS.serverRemainingTime = remaining;
       });
 
+      socket.on("matchEnded", () => {
+        if (!GS.running) return;
+
+        endMatch(true);
+
+        GS.currentLobbyId = null;
+
+        if (socket) {
+          socket.emit("listLobbies");
+        }
+      });
+
       socket.on("state", (playersArray) => {
         // Merge into netPlayers rather than replacing, so players don't flicker
         // when they're temporarily absent from a snapshot. Skip our own entry.
@@ -6484,7 +6496,7 @@
         socket = null;
         netPlayers = {};
         alert("Disconnected from multiplayer server.");
-        showScreen("title-screen");
+        showScreen("lobby-browser-screen");
       });
     }
 

@@ -85,10 +85,17 @@ function broadcastMatchTimers() {
     );
 
     if (remaining <= 0) {
-      lobby.started = false;
 
       io.to(id).emit("matchEnded");
+
+      delete lobbies[id];
+
       broadcastLobbyList();
+
+      console.log(
+        "Match finished, removed lobby:",
+        id
+      );
     }
   }
 }
