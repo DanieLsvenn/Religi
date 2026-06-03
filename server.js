@@ -88,6 +88,7 @@ function broadcastMatchTimers() {
       lobby.started = false;
 
       io.to(id).emit("matchEnded");
+      broadcastLobbyList();
     }
   }
 }
@@ -106,7 +107,7 @@ function cleanupLobbies() {
   }
   broadcastLobbyList();
 }
-setInterval(cleanupLobbies, 10000);
+setInterval(cleanupLobbies, 60000);
 
 function broadcastLobbyTimers() {
   const list = Object.values(lobbies).map((l) => ({
