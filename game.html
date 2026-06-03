@@ -2672,21 +2672,17 @@
       meleeAttacks: [],
       particles: [],
       xpOrbs: [],
-      floatingTexts: [],
-      totems: [],
       kills: 0,
       frameCount: 0,
       lastSpawnTime: 0,
-      time: 0, // total elapsed seconds for animation timers
+      time: 0,
       levelUpQueue: [],
       levelUpActive: false,
-      score: 0,
       leaderboard: [],
       graves: [],
-      spectating: false, // true when player has died and chosen to spectate
-      playerName: "", // set from name prompt
-      spectatorTarget: null, // world coords to follow when spectating
-      currentLobbyId: null, // active lobby id for rejoining
+      spectating: false,
+      playerName: "",
+      currentLobbyId: null,
       isHost: false,
     };
 
@@ -3854,7 +3850,6 @@
     // ═══════════════════════════════════════════════════════════════════════
 
     function updateTimer(dt) {
-      const remaining = GS.multiplayerMode ? GS.serverRemainingTime : Math.max(0, GS.matchTime - GS.elapsed);
       const wave = Math.floor(GS.elapsed / 60) + 1;
       if (wave !== GS.wave) {
         GS.wave = wave;
@@ -5554,7 +5549,7 @@
 
       // Score display
       const scoreVal = document.getElementById("hud-score");
-      if (scoreVal) scoreVal.textContent = GS.player.score || GS.score || 0;
+      if (scoreVal) scoreVal.textContent = GS.player.score ?? 0;
 
       const pList = document.getElementById("hud-players");
       pList.innerHTML = "";
@@ -5646,21 +5641,7 @@
       setTimeout(() => el.remove(), 1000);
     }
 
-    // ═══════════════════════════════════════════════════════════════════════
-    //  LEVEL UP MODAL & TRIVIA
-    // ═══════════════════════════════════════════════════════════════════════
-
-    // returns multiplier for player's ability damage based on global damageMult and per-ability rank
-    function getPlayerAbilityMultiplier(abilityId) {
-      const p = GS.player;
-      if (!p) return 1;
-      const rank = (p.abilityRanks && p.abilityRanks[abilityId]) || 1;
-      const blessBuff =
-        p.blessingActive && p.blessingDamageBuff
-          ? 1 + p.blessingDamageBuff
-          : 1;
-      return (p.damageMult || 1) * blessBuff * (1 + 0.2 * (rank - 1));
-    }
+    // ─── Level-up modal helpers ────────────────────────────────────────────────
 
     function applyStatIncrease(player, stat, level) {
       if (!player) return;
@@ -5998,7 +5979,7 @@
           const ds = document.getElementById("death-stats");
           ds.innerHTML = `
               Wave Reached: <span>${GS.wave}</span><br>
-              Score: <span>${GS.score || GS.player.score || 0}</span><br>
+              Score: <span>${GS.player.score ?? 0}</span><br>
               Enemies Defeated: <span>${GS.kills}</span><br>
               Level: <span>${GS.player.level}</span>`;
           document.getElementById("death-modal").classList.remove("hidden");
@@ -6112,7 +6093,7 @@
       }
     }
 
-    function startMatch() {
+    function startMatch(initState) {
       clearInterval(GS.lobbyTimer);
       document
         .querySelectorAll(".screen")
@@ -6128,7 +6109,6 @@
         elapsed: 0,
         wave: 1,
         kills: 0,
-        score: 0,
         enemies: [],
         projectiles: [],
         particles: [],
@@ -6143,17 +6123,13 @@
       waveEffects.length = 0;
       CAM.x = 0;
       CAM.y = 0;
-      GS.floatingTexts = [];
 
       GS.player = createPlayer(GS.selectedClass, GS.playerName);
-      const me =
-        playerStates.find(
-          p => p.id === socket.id
-        );
 
-      if (me) {
-        GS.player.x = me.x;
-        GS.player.y = me.y;
+      // In multiplayer, reuse the server-assigned spawn position if available
+      if (socket?.connected && initState?.playerStates) {
+        const me = initState.playerStates.find((p) => p.id === socket.id);
+        if (me) { GS.player.x = me.x; GS.player.y = me.y; }
       }
 
       document.getElementById("hud-name").textContent =
@@ -6369,9 +6345,8 @@
         }
         // Guard: don't re-init if match already running (e.g. host's countdown fired first)
         if (!GS.running) {
-          if (initState && initState.gameTime) GS.matchTime = initState.gameTime;
-          GS.player = createPlayer(GS.selectedClass, GS.playerName);
-          startMatch();
+          if (initState?.gameTime) GS.matchTime = initState.gameTime;
+          startMatch(initState);
         }
         startSendingInputs();
       });
@@ -6527,17 +6502,6 @@
         netPlayers = {};
         alert("Disconnected from multiplayer server.");
         showScreen("lobby-browser-screen");
-      });
-    }
-
-    // Legacy alias
-    function startNetworkLobby() {
-      initSocket(() => {
-        if (socket)
-          socket.emit("rejoin", {
-            cls: GS.selectedClass,
-            playerName: GS.playerName,
-          });
       });
     }
 
