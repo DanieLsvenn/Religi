@@ -88,13 +88,11 @@ function broadcastMatchTimers() {
       lobby.started = false;
 
       io.to(id).emit("matchEnded");
-
-      broadcastLobbyList();
     }
   }
 }
 
-setInterval(broadcastMatchTimers, 500);
+setInterval(broadcastMatchTimers, 1000);
 
 // Expire lobbies after 15 minutes
 function cleanupLobbies() {
@@ -108,7 +106,22 @@ function cleanupLobbies() {
   }
   broadcastLobbyList();
 }
-setInterval(cleanupLobbies, 1000);
+setInterval(cleanupLobbies, 10000);
+
+function broadcastLobbyTimers() {
+  const list = Object.values(lobbies).map((l) => ({
+    id: l.id,
+    expiresIn: Math.max(
+      0,
+      Math.ceil(
+        (l.expiresAt - Date.now()) / 1000
+      )
+    )
+  }));
+
+  io.emit("lobbyTimers", list);
+}
+setInterval(broadcastLobbyTimers, 1000);
 
 // ─── Socket handling ──────────────────────────────────────────────────────────
 io.on("connection", (socket) => {

@@ -6248,13 +6248,12 @@
       <div class="le-players">
         Game On-going
       </div>
-    `
-              : `
+    ` : `
       <div class="le-players">
         ${l.players}/${l.maxPlayers}
       </div>
 
-      <div class="le-expires">
+      <div class="le-expires" id="expires-${l.id}">
         ${Math.floor(l.expiresIn / 60)}m
         ${l.expiresIn % 60}s left
       </div>
@@ -6273,6 +6272,21 @@
             });
           }
           container.appendChild(div);
+        }
+      });
+
+      socket.on("lobbyTimers", (timers) => {
+        for (const t of timers) {
+          const el =
+            document.getElementById(
+              `expires-${t.id}`
+            );
+
+          if (!el) continue;
+
+          el.textContent =
+            `${Math.floor(t.expiresIn / 60)}m ` +
+            `${t.expiresIn % 60}s left`;
         }
       });
 
