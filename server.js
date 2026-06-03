@@ -495,23 +495,23 @@ io.on("connection", (socket) => {
       Object.keys(players).length
     );
   });
-});
 
-socket.on("playerTransform", (data) => {
-  const meta = players[socket.id];
-  if (!meta || !meta.lobbyId) return;
+  socket.on("playerTransform", (data) => {
+    const meta = players[socket.id];
+    if (!meta || !meta.lobbyId) return;
 
-  const lobby = lobbies[meta.lobbyId];
-  if (!lobby) return;
+    const lobby = lobbies[meta.lobbyId];
+    if (!lobby) return;
 
-  const p = lobby.members[socket.id];
-  if (!p) return;
+    const p = lobby.members[socket.id];
+    if (!p) return;
 
-  p.x = data.x;
-  p.y = data.y;
-  p.hp = data.hp;
-  p.level = data.level;
-  p.dead = data.dead;
+    p.x = data.x;
+    p.y = data.y;
+    p.hp = data.hp;
+    p.level = data.level;
+    p.dead = data.dead;
+  });
 });
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
