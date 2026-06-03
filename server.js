@@ -16,9 +16,9 @@ app.use(express.static(__dirname));
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "game.html")));
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-const TICK_RATE        = 20;
-const DT               = 1 / TICK_RATE;
-const LOBBY_LIFETIME   = 15 * 60 * 1000; // ms
+const TICK_RATE = 20;
+const DT = 1 / TICK_RATE;
+const LOBBY_LIFETIME = 15 * 60 * 1000; // ms
 
 // ─── In-memory state ──────────────────────────────────────────────────────────
 // players : socketId → { id, name, cls, x, y, hp, level, dead, input,
@@ -48,14 +48,14 @@ function broadcastLeaderboard(lobby) {
 
 /** Build and emit the public lobby list to ALL connected sockets. */
 function broadcastLobbyList() {
-  const now  = Date.now();
+  const now = Date.now();
   const list = Object.values(lobbies).map((l) => ({
-    id:        l.id,
-    name:      l.name,
-    host:      l.hostName,
-    players:   Object.keys(l.members).length,
+    id: l.id,
+    name: l.name,
+    host: l.hostName,
+    players: Object.keys(l.members).length,
     maxPlayers: l.maxPlayers,
-    started:   l.started,
+    started: l.started,
     expiresIn: Math.max(0, Math.ceil((l.expiresAt - now) / 1000)),
   }));
   io.emit("lobbyList", list);
@@ -64,16 +64,16 @@ function broadcastLobbyList() {
 /** Create a fresh player object for a socket joining a lobby. */
 function makePlayer(socketId, name, cls, spawnX = 0, spawnY = 0) {
   return {
-    id:           socketId,
-    name:         name || "Player" + Math.floor(Math.random() * 1000),
-    cls:          cls  || "priest",
-    x:            spawnX,
-    y:            spawnY,
-    hp:           100,
-    level:        1,
-    dead:         false,
-    input:        { dx: 0, dy: 0, speed: 2.4 },
-    lastActive:   Date.now(),
+    id: socketId,
+    name: name || "Player" + Math.floor(Math.random() * 1000),
+    cls: cls || "priest",
+    x: spawnX,
+    y: spawnY,
+    hp: 100,
+    level: 1,
+    dead: false,
+    input: { dx: 0, dy: 0, speed: 2.4 },
+    lastActive: Date.now(),
     _idleCounter: 0,
   };
 }
@@ -110,14 +110,14 @@ function leaveLobby(socket) {
 
   // Reassign host if the host just left
   if (lobby.hostId === socket.id) {
-    lobby.hostId   = remaining[0];
+    lobby.hostId = remaining[0];
     lobby.hostName = lobby.members[remaining[0]]?.name ?? "Host";
   }
 
   io.to(meta.lobbyId).emit("lobbyState", {
-    players:    Object.values(lobby.members),
+    players: Object.values(lobby.members),
     maxPlayers: lobby.maxPlayers,
-    hostId:     lobby.hostId,
+    hostId: lobby.hostId,
   });
   broadcastLobbyList();
 }
@@ -145,9 +145,9 @@ setInterval(() => {
 
 /** Every second: push per-lobby expiry countdowns to the lobby-browser UI. */
 setInterval(() => {
-  const now  = Date.now();
+  const now = Date.now();
   const list = Object.values(lobbies).map((l) => ({
-    id:        l.id,
+    id: l.id,
     expiresIn: Math.max(0, Math.ceil((l.expiresAt - now) / 1000)),
   }));
   io.emit("lobbyTimers", list);
@@ -171,7 +171,7 @@ setInterval(() => {
   const now = Date.now();
 
   for (const lobbyId in lobbies) {
-    const lobby   = lobbies[lobbyId];
+    const lobby = lobbies[lobbyId];
     const members = Object.values(lobby.members);
     if (members.length === 0) continue;
 
@@ -185,16 +185,16 @@ setInterval(() => {
           p._idleCounter = 0;
           const angle = Math.random() * Math.PI * 2;
           io.to(lobbyId).emit("projectile", {
-            x:             p.x,
-            y:             p.y,
-            dx:            Math.cos(angle) * 8,
-            dz:            Math.sin(angle) * 8,
-            damage:        12,
-            color:         "#ffd866",
-            type:          "proj",
+            x: p.x,
+            y: p.y,
+            dx: Math.cos(angle) * 8,
+            dz: Math.sin(angle) * 8,
+            damage: 12,
+            color: "#ffd866",
+            type: "proj",
             sourceAbility: "autofire",
-            ownerId:       p.id,
-            sentAt:        now,
+            ownerId: p.id,
+            sentAt: now,
           });
         }
       } else {
@@ -204,13 +204,13 @@ setInterval(() => {
 
     // Broadcast world snapshot so every client can render remote players
     const snapshot = members.map((p) => ({
-      id:    p.id,
-      x:     p.x,
-      y:     p.y,
-      cls:   p.cls,
-      name:  p.name,
-      dead:  p.dead,
-      hp:    p.hp,
+      id: p.id,
+      x: p.x,
+      y: p.y,
+      cls: p.cls,
+      name: p.name,
+      dead: p.dead,
+      hp: p.hp,
       level: p.level,
     }));
     io.to(lobbyId).emit("state", snapshot);
@@ -224,14 +224,14 @@ io.on("connection", (socket) => {
   // ── Lobby browser ──────────────────────────────────────────────────────────
 
   socket.on("listLobbies", () => {
-    const now  = Date.now();
+    const now = Date.now();
     const list = Object.values(lobbies).map((l) => ({
-      id:        l.id,
-      name:      l.name,
-      host:      l.hostName,
-      players:   Object.keys(l.members).length,
+      id: l.id,
+      name: l.name,
+      host: l.hostName,
+      players: Object.keys(l.members).length,
       maxPlayers: l.maxPlayers,
-      started:   l.started,
+      started: l.started,
       expiresIn: Math.max(0, Math.ceil((l.expiresAt - now) / 1000)),
     }));
     socket.emit("lobbyList", list);
@@ -242,35 +242,35 @@ io.on("connection", (socket) => {
   socket.on("createLobby", ({ name, cls, playerName, maxPlayers, gameTime }) => {
     leaveLobby(socket);
 
-    const id    = makeLobbyId();
+    const id = makeLobbyId();
     const pName = playerName || "Player" + Math.floor(Math.random() * 1000);
 
     const spawn = { x: (Math.random() - 0.5) * 2, y: (Math.random() - 0.5) * 2 };
-    const p     = makePlayer(socket.id, pName, cls, spawn.x, spawn.y);
+    const p = makePlayer(socket.id, pName, cls, spawn.x, spawn.y);
 
     const lobby = {
       id,
-      name:       name || `${pName}'s Lobby`,
-      hostId:     socket.id,
-      hostName:   pName,
+      name: name || `${pName}'s Lobby`,
+      hostId: socket.id,
+      hostName: pName,
       maxPlayers: maxPlayers || 10,
-      gameTime:   gameTime   || 900,
-      members:    { [socket.id]: p },
-      scores:     { [socket.id]: makeScoreEntry(p) },
-      started:    false,
+      gameTime: gameTime || 900,
+      members: { [socket.id]: p },
+      scores: { [socket.id]: makeScoreEntry(p) },
+      started: false,
       matchEndAt: null,
-      expiresAt:  Date.now() + LOBBY_LIFETIME,
+      expiresAt: Date.now() + LOBBY_LIFETIME,
     };
 
     players[socket.id] = { ...p, lobbyId: id };
-    lobbies[id]        = lobby;
+    lobbies[id] = lobby;
 
     socket.join(id);
     socket.emit("lobbyCreated", { lobbyId: id });
     socket.emit("lobbyState", {
-      players:    Object.values(lobby.members),
+      players: Object.values(lobby.members),
       maxPlayers: lobby.maxPlayers,
-      hostId:     lobby.hostId,
+      hostId: lobby.hostId,
     });
     broadcastLobbyList();
     console.log("Lobby created:", id, "by", pName);
@@ -281,27 +281,27 @@ io.on("connection", (socket) => {
   socket.on("joinLobby", ({ lobbyId, cls, playerName }) => {
     const lobby = lobbies[lobbyId];
 
-    if (!lobby)                                           return socket.emit("joinFailed", "Lobby not found.");
-    if (lobby.started)                                    return socket.emit("joinFailed", "Game already in progress.");
+    if (!lobby) return socket.emit("joinFailed", "Lobby not found.");
+    if (lobby.started) return socket.emit("joinFailed", "Game already in progress.");
     if (Object.keys(lobby.members).length >= lobby.maxPlayers) return socket.emit("joinFailed", `Lobby is full (max ${lobby.maxPlayers}).`);
 
     leaveLobby(socket);
 
     // Spread spawns evenly around the camp centre
     const memberCount = Object.keys(lobby.members).length;
-    const angle       = (memberCount / lobby.maxPlayers) * Math.PI * 2;
-    const p           = makePlayer(socket.id, playerName, cls,
-                                   Math.cos(angle) * 6, Math.sin(angle) * 6);
+    const angle = (memberCount / lobby.maxPlayers) * Math.PI * 2;
+    const p = makePlayer(socket.id, playerName, cls,
+      Math.cos(angle) * 6, Math.sin(angle) * 6);
 
     lobby.members[socket.id] = p;
-    lobby.scores[socket.id]  = makeScoreEntry(p);
-    players[socket.id]       = { ...p, lobbyId };
+    lobby.scores[socket.id] = makeScoreEntry(p);
+    players[socket.id] = { ...p, lobbyId };
 
     socket.join(lobbyId);
     io.to(lobbyId).emit("lobbyState", {
-      players:    Object.values(lobby.members),
+      players: Object.values(lobby.members),
       maxPlayers: lobby.maxPlayers,
-      hostId:     lobby.hostId,
+      hostId: lobby.hostId,
     });
     broadcastLobbyList();
     broadcastLeaderboard(lobby);
@@ -312,7 +312,7 @@ io.on("connection", (socket) => {
   // ── Reconnect into existing lobby (e.g. page refresh) ─────────────────────
 
   socket.on("rejoin", ({ cls, playerName } = {}) => {
-    const meta  = players[socket.id];
+    const meta = players[socket.id];
     if (!meta?.lobbyId) return;
 
     const lobby = lobbies[meta.lobbyId];
@@ -330,14 +330,14 @@ io.on("connection", (socket) => {
 
     socket.join(meta.lobbyId);
     socket.emit("lobbyState", {
-      players:    Object.values(lobby.members),
+      players: Object.values(lobby.members),
       maxPlayers: lobby.maxPlayers,
-      hostId:     lobby.hostId,
+      hostId: lobby.hostId,
     });
     if (lobby.started) {
       socket.emit("startMatch", {
         playerStates: Object.values(lobby.members),
-        gameTime:     lobby.gameTime,
+        gameTime: lobby.gameTime,
       });
     }
   });
@@ -346,8 +346,8 @@ io.on("connection", (socket) => {
 
   socket.on("changeClass", ({ cls }) => {
     if (!cls) return;
-    const meta  = players[socket.id];
-    if (!meta)  return;
+    const meta = players[socket.id];
+    if (!meta) return;
 
     meta.cls = cls;
     const lobby = meta.lobbyId ? lobbies[meta.lobbyId] : null;
@@ -355,9 +355,9 @@ io.on("connection", (socket) => {
 
     if (lobby.members[socket.id]) lobby.members[socket.id].cls = cls;
     io.to(lobby.id).emit("lobbyState", {
-      players:    Object.values(lobby.members),
+      players: Object.values(lobby.members),
       maxPlayers: lobby.maxPlayers,
-      hostId:     lobby.hostId,
+      hostId: lobby.hostId,
     });
     socket.to(lobby.id).emit("playerClassChanged", { id: socket.id, cls });
   });
@@ -369,12 +369,12 @@ io.on("connection", (socket) => {
     if (!meta) return;
 
     const input = { dx: Number(dx) || 0, dy: Number(dy) || 0, speed: Number(speed) || 2.4 };
-    meta.input      = input;
+    meta.input = input;
     meta.lastActive = Date.now();
 
     const lobby = meta.lobbyId ? lobbies[meta.lobbyId] : null;
     if (lobby?.members[socket.id]) {
-      lobby.members[socket.id].input      = input;
+      lobby.members[socket.id].input = input;
       lobby.members[socket.id].lastActive = meta.lastActive;
     }
   });
@@ -386,11 +386,11 @@ io.on("connection", (socket) => {
     const member = lobbies[meta.lobbyId]?.members[socket.id];
     if (!member) return;
 
-    member.x     = x;
-    member.y     = y;
-    member.hp    = hp;
+    member.x = x;
+    member.y = y;
+    member.hp = hp;
     member.level = level;
-    member.dead  = dead;
+    member.dead = dead;
   });
 
   // ── Combat events ──────────────────────────────────────────────────────────
@@ -400,7 +400,7 @@ io.on("connection", (socket) => {
     const lobbyId = players[socket.id]?.lobbyId;
     const payload = { ...proj, ownerId: socket.id, sentAt: Date.now() };
     if (lobbyId) socket.to(lobbyId).emit("projectile", payload);
-    else         socket.broadcast.emit("projectile", payload);
+    else socket.broadcast.emit("projectile", payload);
   });
 
   socket.on("ability", (data) => {
@@ -408,11 +408,11 @@ io.on("connection", (socket) => {
     const lobbyId = players[socket.id]?.lobbyId;
     const payload = { ...data, ownerId: socket.id };
     if (lobbyId) socket.to(lobbyId).emit("ability", payload);
-    else         socket.broadcast.emit("ability", payload);
+    else socket.broadcast.emit("ability", payload);
   });
 
   socket.on("enemyKilled", ({ points, wave }) => {
-    const meta  = players[socket.id];
+    const meta = players[socket.id];
     if (!meta?.lobbyId) return;
     const lobby = lobbies[meta.lobbyId];
     if (!lobby) return;
@@ -433,7 +433,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("playerDead", ({ x, y, name, wave, score }) => {
-    const meta  = players[socket.id];
+    const meta = players[socket.id];
     if (!meta?.lobbyId) return;
     const lobby = lobbies[meta.lobbyId];
     if (!lobby) return;
@@ -442,19 +442,19 @@ io.on("connection", (socket) => {
 
     const entry = lobby.scores[socket.id];
     if (entry) {
-      entry.dead  = true;
+      entry.dead = true;
       entry.score = Math.max(entry.score || 0, score || 0);
       if (wave) entry.wave = wave;
     }
 
     const lb = buildLeaderboard(lobby);
     io.to(lobby.id).emit("playerDied", {
-      id:          socket.id,
-      x:           x    || 0,
-      y:           y    || 0,
-      name:        name || meta.name || "Unknown",
-      wave:        wave || 1,
-      score:       score || 0,
+      id: socket.id,
+      x: x || 0,
+      y: y || 0,
+      name: name || meta.name || "Unknown",
+      wave: wave || 1,
+      score: score || 0,
       leaderboard: lb,
     });
     broadcastLeaderboard(lobby);
@@ -474,17 +474,17 @@ io.on("connection", (socket) => {
   // ── Match control ──────────────────────────────────────────────────────────
 
   socket.on("startNow", () => {
-    const meta  = players[socket.id];
+    const meta = players[socket.id];
     if (!meta?.lobbyId) return;
     const lobby = lobbies[meta.lobbyId];
     if (!lobby || lobby.hostId !== socket.id) return; // only host may start
 
-    lobby.started    = true;
+    lobby.started = true;
     lobby.matchEndAt = Date.now() + lobby.gameTime * 1000;
 
     io.to(lobby.id).emit("startMatch", {
       playerStates: Object.values(lobby.members),
-      gameTime:     lobby.gameTime,
+      gameTime: lobby.gameTime,
     });
     broadcastLobbyList();
   });
