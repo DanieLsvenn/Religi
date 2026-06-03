@@ -108,7 +108,7 @@ function cleanupLobbies() {
   }
   broadcastLobbyList();
 }
-setInterval(cleanupLobbies, 500);
+setInterval(cleanupLobbies, 10000);
 
 // ─── Socket handling ──────────────────────────────────────────────────────────
 io.on("connection", (socket) => {

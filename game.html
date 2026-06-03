@@ -3844,7 +3844,7 @@
     // ═══════════════════════════════════════════════════════════════════════
 
     function updateTimer(dt) {
-      const remaining = GS.serverRemainingTime;
+      const remaining = GS.multiplayerMode ? GS.serverRemainingTime : Math.max(0, GS.matchTime - GS.elapsed);
       const wave = Math.floor(GS.elapsed / 60) + 1;
       if (wave !== GS.wave) {
         GS.wave = wave;
@@ -5508,7 +5508,7 @@
     function updateHUD() {
       const p = GS.player;
       if (!p) return;
-      const remaining = GS.serverRemainingTime;
+      const remaining = GS.multiplayerMode ? GS.serverRemainingTime : Math.max(0, GS.matchTime - GS.elapsed);
       const mins = Math.floor(remaining / 60)
         .toString()
         .padStart(2, "0");
@@ -6223,43 +6223,73 @@
       });
 
       socket.on("lobbyList", (list) => {
-        const container = document.getElementById("lobby-list");
+        GS.lobbies = list.map((l) => ({
+          ...l,
+          expiresInLocal: l.expiresIn,
+        }));
+
+        renderLobbyList();
+      });
+
+      function renderLobbyList() {
+        const container =
+          document.getElementById("lobby-list");
+
         if (!container) return;
+
+        const list = GS.lobbies;
+
         if (!list || list.length === 0) {
           container.innerHTML =
             '<div class="lobby-empty">No arenas active. Create one!</div>';
           return;
         }
+
         container.innerHTML = "";
+
         for (const l of list) {
-          const full = l.players >= l.maxPlayers || l.started;
+          const full =
+            l.players >= l.maxPlayers ||
+            l.started;
+
           const div = document.createElement("div");
+
           div.className =
             "lobby-entry" +
             (full ? " full" : "") +
             (l.started ? " started" : "");
+
           div.innerHTML = `
-              <div>
-                <div class="le-name">${escapeHtml(l.name)}</div>
-                <div class="le-meta">Host: ${escapeHtml(l.host)} \u00b7 ID: ${l.id}${l.started ? " \u00b7 IN PROGRESS" : ""}</div>
-              </div>
-              ${l.started
-              ? `
-      <div class="le-players">
-        Game On-going
-      </div>
-    `
-              : `
-      <div class="le-players">
-        ${l.players}/${l.maxPlayers}
+      <div>
+        <div class="le-name">${escapeHtml(l.name)}</div>
+        <div class="le-meta">
+          Host: ${escapeHtml(l.host)}
+          · ID: ${l.id}
+          ${l.started ? " · IN PROGRESS" : ""}
+        </div>
       </div>
 
-      <div class="le-expires">
-        ${Math.floor(l.expiresIn / 60)}m
-        ${l.expiresIn % 60}s left
-      </div>
-    `
-            }`;
+      ${l.started
+              ? `
+            <div class="le-players">
+              Game On-going
+            </div>
+          `
+              : `
+            <div class="le-players">
+              ${l.players}/${l.maxPlayers}
+            </div>
+
+            <div class="le-expires">
+              ${Math.floor(
+                l.expiresInLocal / 60
+              )}m
+              ${l.expiresInLocal % 60}s left
+            </div>
+          `
+            }
+    `;
+
           if (!full) {
             div.addEventListener("click", () => {
               socket.emit("joinLobby", {
@@ -6267,14 +6297,36 @@
                 cls: GS.selectedClass,
                 playerName: GS.playerName,
               });
+
               GS.currentLobbyId = l.id;
+
               showScreen("lobby-screen");
-              console.log("isHost: " + GS.isHost);
             });
           }
+
           container.appendChild(div);
         }
-      });
+      }
+
+      setInterval(() => {
+        if (!GS.lobbies) return;
+
+        let changed = false;
+
+        for (const l of GS.lobbies) {
+          if (
+            !l.started &&
+            l.expiresInLocal > 0
+          ) {
+            l.expiresInLocal--;
+            changed = true;
+          }
+        }
+
+        if (changed) {
+          renderLobbyList();
+        }
+      }, 1000);
 
       socket.on("lobbyState", (data) => {
         const playersList = data.players || [];
