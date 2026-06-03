@@ -394,6 +394,8 @@
       gap: 4px;
       align-items: flex-end;
       min-width: 180px;
+      max-height: 200px;
+      overflow-y: auto;
     }
 
     .hud-player-row {
@@ -401,13 +403,38 @@
       align-items: center;
       gap: 6px;
       font-size: 7px;
+      width: 100%;
+      justify-content: flex-end;
     }
 
     .hud-player-row .pip {
       width: 8px;
       height: 8px;
       border-radius: 50%;
+      flex-shrink: 0;
     }
+
+    .hud-player-row .pr-rank {
+      color: var(--dim);
+      min-width: 14px;
+      text-align: right;
+    }
+
+    .hud-player-row .pr-score {
+      color: var(--teal);
+      min-width: 36px;
+      text-align: right;
+    }
+
+    .hud-player-row .pr-name {
+      flex: 1;
+      text-align: right;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .hud-player-row.you .pr-name { color: var(--gold); }
 
     .hud-player-row.dead {
       opacity: 0.35;
@@ -691,32 +718,36 @@
       image-rendering: pixelated;
     }
 
-    .leaderboard {
-      position: absolute;
-      top: 210px;
-      right: 14px;
-      width: 200px;
-      max-height: 360px;
-      overflow: auto;
-      background: rgba(8, 8, 12, 0.9);
-      border: 2px solid var(--border);
-      padding: 8px;
-      font-size: 9px;
-      z-index: 60;
+    /* ── Conclusion screen ── */
+    #conclusion-screen {
+      background: radial-gradient(ellipse at 50% 40%, #0a1a2e 0%, #0a0a0f 70%);
+      gap: 20px;
+      z-index: 310;
     }
-
-    .leaderboard h3 {
-      font-size: 10px;
-      color: var(--gold);
-      margin-bottom: 6px;
+    #conclusion-screen h2 { font-size: 20px; }
+    #conclusion-screen h2.win  { color: var(--gold); text-shadow: 0 0 30px var(--gold); }
+    #conclusion-screen h2.lose { color: var(--red);  text-shadow: 0 0 30px var(--red); }
+    .conclusion-table {
+      width: 500px;
+      border-collapse: collapse;
     }
-
-    .leader-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 6px;
-      margin-bottom: 6px;
+    .conclusion-table th {
+      font-size: 7px;
+      color: var(--dim);
+      padding: 4px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
     }
+    .conclusion-table td {
+      font-size: 8px;
+      padding: 5px 10px;
+      border-bottom: 1px solid #1a1a28;
+      color: var(--text);
+    }
+    .conclusion-table tr.you td { color: var(--gold); }
+    .conclusion-table tr.dead td { opacity: 0.5; }
+    .conclusion-table td.rank { color: var(--dim); width: 24px; }
+    .conclusion-table td.score-col { color: var(--teal); text-align: right; }
 
     #minimap-canvas.hidden {
       display: none;
@@ -887,67 +918,8 @@
       color: var(--text);
     }
 
-    /* ── In-game Leaderboard panel ── */
-    #leaderboard-panel {
-      position: absolute;
-      top: 210px;
-      right: 14px;
-      width: 210px;
-      background: rgba(6, 6, 14, 0.93);
-      border: 2px solid var(--border);
-      padding: 8px;
-      font-size: 8px;
-      z-index: 60;
-      pointer-events: none;
-    }
-
-    #leaderboard-panel.hidden {
-      display: none;
-    }
-
-    #leaderboard-panel h3 {
-      font-size: 9px;
-      color: var(--gold);
-      margin-bottom: 6px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 4px;
-    }
-
-    .lb-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 4px;
-      padding: 3px 2px;
-      border-bottom: 1px solid #1a1a28;
-      font-size: 7px;
-    }
-
-    .lb-row.lb-you {
-      color: var(--gold);
-    }
-
-    .lb-row.lb-dead {
-      opacity: 0.45;
-      text-decoration: line-through;
-    }
-
-    .lb-rank {
-      width: 16px;
-      color: var(--dim);
-    }
-
-    .lb-name {
-      flex: 1;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .lb-score {
-      color: var(--teal);
-      text-align: right;
-    }
+    /* leaderboard-panel hidden by default; shown via JS */
+    #leaderboard-panel.hidden { display: none; }
 
     /* ── Spectator overlay ── */
     #spectator-hud {
@@ -1174,11 +1146,7 @@
     </div>
   </div>
 
-  <!-- IN-GAME LEADERBOARD PANEL -->
-  <div id="leaderboard-panel" class="hidden">
-    <h3>★ LEADERBOARD</h3>
-    <div id="lb-rows"></div>
-  </div>
+  <!-- IN-GAME LEADERBOARD (merged into hud-players — no separate panel div needed) -->
 
   <!-- SPECTATOR HUD -->
   <div id="spectator-hud" class="hidden">
@@ -1186,7 +1154,7 @@
     <div class="spec-sub">You have fallen — watching the battle unfold</div>
   </div>
 
-  <!-- DEATH MODAL -->
+  <!-- DEATH MODAL (personal stats + spectate/leave) -->
   <div id="death-modal" class="hidden">
     <h2>✦ YOU HAVE FALLEN ✦</h2>
     <div class="death-stats" id="death-stats"></div>
@@ -1213,6 +1181,25 @@
           text-align: center;
         ">
       Click a card to flip it · Answer correctly to unlock
+    </div>
+  </div>
+
+  <!-- CONCLUSION SCREEN (shown after match ends — ranked leaderboard) -->
+  <div class="screen hidden" id="conclusion-screen">
+    <h2 id="conclusion-title">BATTLE CONCLUDED</h2>
+    <div id="conclusion-sub" style="font-size:8px;color:var(--dim);margin-bottom:16px"></div>
+    <table class="conclusion-table" id="conclusion-table">
+      <thead>
+        <tr>
+          <th>#</th><th>CLASS</th><th>PLAYER</th>
+          <th>LVL</th><th>WAVE</th><th>KILLS</th><th style="text-align:right">SCORE</th>
+        </tr>
+      </thead>
+      <tbody id="conclusion-rows"></tbody>
+    </table>
+    <div style="display:flex;gap:16px;margin-top:20px">
+      <button class="btn" id="btn-conclusion-again">► PLAY AGAIN</button>
+      <button class="btn" id="btn-conclusion-menu">◄ MENU</button>
     </div>
   </div>
 
@@ -5971,45 +5958,148 @@
     //  MATCH END
     // ═══════════════════════════════════════════════════════════════════════
 
+    /** Show the death modal for the local player (multiplayer only). */
+    function showDeathModal() {
+      const p = GS.player;
+      document.getElementById("death-stats").innerHTML =
+        `Wave Reached: <span>${GS.wave}</span><br>
+         Score: <span>${p.score ?? 0}</span><br>
+         Enemies Defeated: <span>${GS.kills}</span><br>
+         Level: <span>${p.level}</span><br>
+         Class: <span>${p.cls.icon} ${p.cls.name}</span>`;
+      document.getElementById("levelup-modal").classList.add("hidden");
+      document.getElementById("death-modal").classList.remove("hidden");
+    }
+
+    /**
+     * Called whenever a player (local or bot) dies.
+     * Solo: player death → immediate loss screen.
+     * Multiplayer: local death → show death modal; all players dead → conclusion.
+     */
     function checkMatchOver() {
       if (!GS.running) return;
-      if (GS.player && GS.player.dead) {
-        // In multiplayer, offer spectate instead of ending immediately
-        if (socket && socket.connected) {
-          const ds = document.getElementById("death-stats");
-          ds.innerHTML = `
-              Wave Reached: <span>${GS.wave}</span><br>
-              Score: <span>${GS.player.score ?? 0}</span><br>
-              Enemies Defeated: <span>${GS.kills}</span><br>
-              Level: <span>${GS.player.level}</span>`;
-          document.getElementById("levelup-modal").classList.add("hidden");
-          document.getElementById("death-modal").classList.remove("hidden");
-          // Keep GS.running = true so the world keeps ticking for spectators
-        } else {
-          endMatch(false);
-        }
+      if (!GS.player?.dead) return;
+
+      if (!GS.multiplayerMode) {
+        // Solo — end immediately as a loss
+        endMatch(false);
+        return;
+      }
+
+      // Multiplayer — show personal death modal first (if not already showing)
+      if (document.getElementById("death-modal").classList.contains("hidden")) {
+        showDeathModal();
+        // Keep GS.running = true so the world keeps ticking for spectators
+      }
+
+      // Check if every known participant is dead
+      const netDead = Object.values(netPlayers || {}).every((p) => p.dead);
+      const botsDead = GS.botPlayers.every((b) => b.dead);
+      if (netDead && botsDead) {
+        // Everyone is dead — emit to server so it cleans up the lobby
+        if (socket?.connected) socket.emit("allPlayersDead");
+        showConclusion(false);
       }
     }
 
-    function endMatch(survived) {
+    /**
+     * Build and show the conclusion screen.
+     * survived = true  → time ran out (win)
+     * survived = false → all players dead (loss)
+     */
+    function showConclusion(survived) {
       GS.running = false;
       document.getElementById("levelup-modal").classList.add("hidden");
-      document.getElementById("end-screen").classList.remove("hidden");
-      const title = document.getElementById("end-title");
-      if (survived) {
-        title.textContent = "✦ YOU SURVIVED ✦";
-        title.className = "win";
-      } else {
-        title.textContent = "✦ FALLEN ✦";
-        title.className = "lose";
-      }
+      document.getElementById("death-modal").classList.add("hidden");
+
+      const title = document.getElementById("conclusion-title");
+      title.textContent = survived ? "✦ YOU SURVIVED ✦" : "✦ ALL HAVE FALLEN ✦";
+      title.className   = survived ? "win" : "lose";
+
       const elapsed = Math.floor(GS.elapsed);
-      document.getElementById("end-stats").innerHTML = `
-    Time Survived: <span>${Math.floor(elapsed / 60)}:${(elapsed % 60).toString().padStart(2, "0")}</span><br>
-    Enemies Defeated: <span>${GS.kills}</span><br>
-    Level Reached: <span>${GS.player?.level || 1}</span><br>
-    Class: <span>${GS.player?.cls.icon} ${GS.player?.cls.name || "?"}</span><br>
-    Wave Survived: <span>Wave ${GS.wave}</span>`;
+      document.getElementById("conclusion-sub").textContent =
+        `Time: ${Math.floor(elapsed / 60)}:${(elapsed % 60).toString().padStart(2, "0")}  ·  Wave ${GS.wave}`;
+
+      // Build ranked rows from leaderboard (multiplayer) or local data (solo/bots)
+      const rows = buildConclusionRows();
+      const tbody = document.getElementById("conclusion-rows");
+      tbody.innerHTML = "";
+      rows.forEach((entry, i) => {
+        const tr = document.createElement("tr");
+        const isYou = entry.isLocal;
+        tr.className = (isYou ? "you" : "") + (entry.dead ? " dead" : "");
+        tr.innerHTML =
+          `<td class="rank">${i + 1}</td>` +
+          `<td>${escapeHtml(entry.icon || "?")}</td>` +
+          `<td>${escapeHtml((entry.name || "Player").substring(0, 12))}${isYou ? " ★" : ""}</td>` +
+          `<td>${entry.level || 1}</td>` +
+          `<td>${entry.wave || GS.wave}</td>` +
+          `<td>${entry.kills ?? "–"}</td>` +
+          `<td class="score-col">${entry.score || 0}</td>`;
+        tbody.appendChild(tr);
+      });
+
+      document.querySelectorAll(".screen").forEach((s) => s.classList.add("hidden"));
+      document.getElementById("conclusion-screen").classList.remove("hidden");
+    }
+
+    /** Assemble sorted leaderboard entries from all sources. */
+    function buildConclusionRows() {
+      const entries = [];
+
+      // Local player
+      if (GS.player) {
+        const p = GS.player;
+        entries.push({
+          isLocal: true,
+          name:  GS.playerName || p.cls.name,
+          icon:  p.cls.icon,
+          level: p.level,
+          wave:  GS.wave,
+          kills: GS.kills,
+          score: p.score || 0,
+          dead:  p.dead,
+        });
+      }
+
+      // Bot players (solo mode)
+      for (const b of GS.botPlayers) {
+        entries.push({
+          isLocal: false,
+          name:  b.name,
+          icon:  b.cls?.icon || "?",
+          level: b.level || 1,
+          wave:  GS.wave,
+          kills: null,
+          score: b.score || 0,
+          dead:  b.dead,
+        });
+      }
+
+      // Multiplayer net players (server leaderboard takes priority if available)
+      if (GS.leaderboard && GS.leaderboard.length > 0) {
+        // Use server leaderboard; mark local player
+        return GS.leaderboard.map((e) => {
+          const cls = CLASSES.find((c) => c.id === e.cls);
+          return {
+            isLocal: socket && e.id === socket.id,
+            name:    e.name,
+            icon:    cls?.icon || "?",
+            level:   e.level || 1,
+            wave:    e.wave || GS.wave,
+            kills:   null,
+            score:   e.score || 0,
+            dead:    e.dead,
+          };
+        });
+      }
+
+      return entries.sort((a, b) => b.score - a.score);
+    }
+
+    /** Legacy path — show the old end-screen for solo quick-end. */
+    function endMatch(survived) {
+      showConclusion(survived);
     }
 
     // ═══════════════════════════════════════════════════════════════════════
