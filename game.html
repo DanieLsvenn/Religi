@@ -5982,6 +5982,7 @@
               Score: <span>${GS.player.score ?? 0}</span><br>
               Enemies Defeated: <span>${GS.kills}</span><br>
               Level: <span>${GS.player.level}</span>`;
+          document.getElementById("levelup-modal").classList.add("hidden");
           document.getElementById("death-modal").classList.remove("hidden");
           // Keep GS.running = true so the world keeps ticking for spectators
         } else {
