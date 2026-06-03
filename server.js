@@ -239,12 +239,25 @@ io.on("connection", (socket) => {
 
     leavePreviousLobby(socket);
 
+    const angle =
+      (Object.keys(lobby.members).length *
+        Math.PI * 2) /
+      lobby.maxPlayers;
+
+    const radius = 6;
+
+    const spawnX =
+      Math.cos(angle) * radius;
+
+    const spawnY =
+      Math.sin(angle) * radius;
+
     const p = {
       id: socket.id,
       name: playerName || name || "Player" + Math.floor(Math.random() * 1000),
       cls: cls || "priest",
-      x: (Math.random() - 0.5) * 2,
-      y: (Math.random() - 0.5) * 2,
+      x: spawnX,
+      y: spawnY,
       hp: 100,
       level: 1,
       input: { dx: 0, dy: 0, speed: 2.4 },
@@ -484,6 +497,23 @@ io.on("connection", (socket) => {
   });
 });
 
+socket.on("playerTransform", (data) => {
+  const meta = players[socket.id];
+  if (!meta || !meta.lobbyId) return;
+
+  const lobby = lobbies[meta.lobbyId];
+  if (!lobby) return;
+
+  const p = lobby.members[socket.id];
+  if (!p) return;
+
+  p.x = data.x;
+  p.y = data.y;
+  p.hp = data.hp;
+  p.level = data.level;
+  p.dead = data.dead;
+});
+
 // ─── Helper ───────────────────────────────────────────────────────────────────
 function leavePreviousLobby(socket) {
   const meta = players[socket.id];
@@ -525,19 +555,7 @@ setInterval(() => {
     const allMembers = Object.values(lobby.members);
 
     for (const p of allMembers) {
-      if (p.dead) continue; // dead players don't move, but are still broadcast
-      const dx = p.input?.dx || 0;
-      const dy = p.input?.dy || 0;
-      const speed = p.input?.speed || 2.4;
-      // Use world bounds matching the client (was ±13, caused players to freeze)
-      p.x = Math.max(
-        -WORLD_BOUNDS_X,
-        Math.min(WORLD_BOUNDS_X, p.x + dx * speed * DT),
-      );
-      p.y = Math.max(
-        -WORLD_BOUNDS_Y,
-        Math.min(WORLD_BOUNDS_Y, p.y + dy * speed * DT),
-      );
+      if (p.dead) continue;
 
       // Idle auto-fire
       const idleMs = now - (p.lastActive || 0);

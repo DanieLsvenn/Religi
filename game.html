@@ -2697,41 +2697,50 @@
     // ═══════════════════════════════════════════════════════════════════════
 
     function getSpawnPosition(avoid = []) {
-      const margin = 8;
-      const jitter = 4;
-      const corners = [
-        { x: -WORLD_BOUNDS_X + margin, y: -WORLD_BOUNDS_Y + margin },
-        { x: WORLD_BOUNDS_X - margin, y: -WORLD_BOUNDS_Y + margin },
-        { x: -WORLD_BOUNDS_X + margin, y: WORLD_BOUNDS_Y - margin },
-        { x: WORLD_BOUNDS_X - margin, y: WORLD_BOUNDS_Y - margin },
-      ];
 
-      let bestDist = -Infinity;
-      const candidates = [];
-      for (const corner of corners) {
+      const CAMP_X = 0;
+      const CAMP_Y = 0;
+
+      const MIN_RADIUS = 4;
+      const MAX_RADIUS = 10;
+
+      let best = null;
+      let bestScore = -Infinity;
+
+      for (let i = 0; i < 30; i++) {
+
+        const angle =
+          Math.random() * Math.PI * 2;
+
+        const radius =
+          MIN_RADIUS +
+          Math.random() *
+          (MAX_RADIUS - MIN_RADIUS);
+
+        const candidate = {
+          x: CAMP_X + Math.cos(angle) * radius,
+          y: CAMP_Y + Math.sin(angle) * radius
+        };
+
         let minDist = Infinity;
+
         for (const p of avoid) {
           if (!p || p.dead) continue;
-          minDist = Math.min(
-            minDist,
-            (corner.x - p.x) ** 2 + (corner.y - p.y) ** 2,
-          );
+
+          const d =
+            (candidate.x - p.x) ** 2 +
+            (candidate.y - p.y) ** 2;
+
+          minDist = Math.min(minDist, d);
         }
-        if (minDist > bestDist) {
-          bestDist = minDist;
-          candidates.length = 0;
-          candidates.push(corner);
-        } else if (minDist === bestDist) {
-          candidates.push(corner);
+
+        if (minDist > bestScore) {
+          bestScore = minDist;
+          best = candidate;
         }
       }
 
-      const best = candidates[Math.floor(Math.random() * candidates.length)];
-
-      return {
-        x: best.x + (Math.random() - 0.5) * jitter,
-        y: best.y + (Math.random() - 0.5) * jitter,
-      };
+      return best;
     }
 
     function createPlayer(clsId, name) {
@@ -3870,6 +3879,17 @@
       ny = Math.max(-boundY, Math.min(boundY, ny));
       p.x = nx;
       p.y = ny;
+
+      if (socket && GS.multiplayerMode) {
+        socket.emit("playerTransform", {
+          x: p.x,
+          y: p.y,
+          hp: p.hp,
+          level: p.level,
+          dead: p.dead
+        });
+      }
+
       if (input.dx !== 0 || input.dy !== 0) {
         p.facing.x = input.dx;
         p.facing.y = input.dy;
@@ -6126,6 +6146,16 @@
       GS.floatingTexts = [];
 
       GS.player = createPlayer(GS.selectedClass, GS.playerName);
+      const me =
+        playerStates.find(
+          p => p.id === socket.id
+        );
+
+      if (me) {
+        GS.player.x = me.x;
+        GS.player.y = me.y;
+      }
+
       document.getElementById("hud-name").textContent =
         GS.player.cls.icon +
         " " +
