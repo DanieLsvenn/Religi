@@ -459,6 +459,23 @@
       color: white;
     }
 
+    .ability-slot .sl-overlay {
+      position: absolute;
+      left: 50%;
+      top: -18px;
+      transform: translateX(-50%);
+      background: #183d18;
+      color: #66ff66;
+      border: 1px solid #44aa44;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 10px;
+      font-weight: bold;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 20;
+    }
+
     .hud-kill-counter {
       position: absolute;
       bottom: 14px;
@@ -1992,9 +2009,9 @@
       {
         id: "shadow",
         name: "Shadow",
-        hp: 30,
+        hp: 20,
         spd: 1.6,
-        dmg: 8,
+        dmg: 4,
         xp: 5,
         points: 10,
         size: 18,
@@ -2003,9 +2020,9 @@
       {
         id: "wraith",
         name: "Wraith",
-        hp: 60,
+        hp: 40,
         spd: 1.2,
-        dmg: 15,
+        dmg: 10,
         xp: 10,
         points: 20,
         size: 22,
@@ -2014,9 +2031,9 @@
       {
         id: "golem",
         name: "Golem",
-        hp: 200,
+        hp: 150,
         spd: 0.6,
-        dmg: 25,
+        dmg: 15,
         xp: 20,
         points: 60,
         size: 28,
@@ -2025,9 +2042,9 @@
       {
         id: "specter",
         name: "Specter",
-        hp: 40,
-        spd: 2.4,
-        dmg: 10,
+        hp: 25,
+        spd: 2.0,
+        dmg: 5,
         xp: 8,
         points: 12,
         size: 16,
@@ -2036,7 +2053,7 @@
       {
         id: "demon",
         name: "Demon",
-        hp: 150,
+        hp: 120,
         spd: 1.0,
         dmg: 30,
         xp: 25,
@@ -2748,6 +2765,7 @@
       playerName: "",
       currentLobbyId: null,
       isHost: false,
+      answeredTrivia: Set(),
     };
 
     let lastTimestamp = 0;
@@ -4402,22 +4420,24 @@
         player.xpNeeded = Math.floor(player.xpNeeded * 1.4);
         player.level++;
         const lvl = player.level;
-        // Every 5 levels: innate scales automatically (no choice) + milestone ability choice
-        // Every non-5-multiple level: stat choice
-        if (lvl % 5 === 0) {
-          // Auto-scale innate (silent)
-          const innateId = player.cls && player.cls.innateAbility;
-          if (innateId) {
-            player.abilityRanks[innateId] =
-              (player.abilityRanks[innateId] || 1) + 1;
-          }
-          addFloatText(
-            player.x,
-            player.y - 1.5,
-            "INNATE UPGRADED!",
-            "#ffffaa",
-          );
-          // Also give a milestone ability choice
+
+        // Auto-scale innate every level
+        const innateId = player.cls && player.cls.innateAbility;
+        if (innateId) {
+          player.abilityRanks[innateId] =
+            (player.abilityRanks[innateId] || 1) + 1;
+        }
+
+        addFloatText(
+          player.x,
+          player.y - 1.5,
+          "INNATE UPGRADED!",
+          "#ffffaa",
+        );
+
+        // Odd levels = stat choice
+        // Even levels = ability quiz
+        if (lvl % 2 === 0) {
           GS.levelUpQueue.push({ type: "ability", level: lvl });
         } else {
           GS.levelUpQueue.push({ type: "stat", level: lvl });
@@ -5663,10 +5683,47 @@
         if (innateId && ABILITIES[innateId]) {
           const def = ABILITIES[innateId];
           const slot = document.createElement("div");
+          slot.addEventListener("mouseenter", () => {
+            let ov = slot.querySelector(".sl-overlay");
+
+            if (!ov) {
+              ov = document.createElement("div");
+              ov.className = "sl-overlay";
+              slot.appendChild(ov);
+            }
+
+            ov.textContent = `Lvl ${rank}`;
+          });
+
+          slot.addEventListener("mouseleave", () => {
+            const ov = slot.querySelector(".sl-overlay");
+            if (ov) ov.remove();
+          });
+
           slot.className = "ability-slot active";
           slot.style.borderColor = "#ffd700";
           const iRankDisp = (p.abilityRanks && p.abilityRanks[innateId]) || 1;
-          slot.innerHTML = `<span>${def.icon}</span><span class="akey" style="color:#ffd700">Lv${iRankDisp}</span>`;
+          slot.innerHTML = `
+  <span>${def.icon}</span>
+  <span class="akey" style="color:#ffd700">${def.name.substring(0, 5)}</span>
+`;
+
+          slot.addEventListener("mouseenter", () => {
+            let ov = slot.querySelector(".sl-overlay");
+
+            if (!ov) {
+              ov = document.createElement("div");
+              ov.className = "sl-overlay";
+              slot.appendChild(ov);
+            }
+
+            ov.textContent = `Lvl ${iRankDisp}`;
+          });
+
+          slot.addEventListener("mouseleave", () => {
+            const ov = slot.querySelector(".sl-overlay");
+            if (ov) ov.remove();
+          });
           const iCd = Math.max(0, p.innateTimer || 0);
           if (iCd > 0.05) {
             const ov = document.createElement("div");
@@ -5683,6 +5740,11 @@
           const slot = document.createElement("div");
           slot.className = "ability-slot active";
           const rank = (p.abilityRanks && p.abilityRanks[ab]) || 1;
+
+          slot.innerHTML = `
+  <span>${def.icon}</span>
+  <span class="akey">${def.name.substring(0, 5)}</span>
+`;
           const rankStr = rank > 1 ? ` R${rank}` : "";
           slot.innerHTML = `<span>${def.icon}</span><span class="akey">${def.name.substring(0, 5)}${rankStr}</span>`;
           const cd = p.abilityCooldowns[ab] || 0;
@@ -5953,7 +6015,21 @@
         if (!def) continue;
         const tradition = player.cls.religion.toLowerCase();
         const triviaBank = TRIVIA[tradition] || TRIVIA.christianity;
-        const q = triviaBank[Math.floor(Math.random() * triviaBank.length)];
+
+        let availableQuestions = triviaBank.filter(
+          (q) => !GS.answeredTrivia.has(q.q)
+        );
+
+        if (availableQuestions.length === 0) {
+          availableQuestions = triviaBank; // fallback if all questions have been used
+        }
+
+        const q =
+          availableQuestions[
+          Math.floor(Math.random() * availableQuestions.length)
+          ];
+
+        GS.answeredTrivia.add(q.q);
 
         const card = document.createElement("div");
         card.className = "ability-card";
