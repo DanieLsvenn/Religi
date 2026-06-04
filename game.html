@@ -1750,242 +1750,275 @@
       },
     };
 
+    const commonTriviaBank = [
+      {
+        q: "Theo quan điểm của chủ nghĩa Mác – Lênin, tôn giáo là gì?",
+        a: [
+          "A. Một hình thức sản xuất vật chất của con người",
+          "B. Một hình thái ý thức xã hội phản ánh hư ảo hiện thực khách quan",
+          "C. Một công cụ của giai cấp thống trị",
+          "D. Một hệ tư tưởng khoa học",
+        ],
+        correct: 2,
+      },
+      {
+        q: "Theo Lênin, tôn giáo chỉ mất đi khi nào?",
+        a: [
+          "Khi xã hội đạt trình độ văn minh công nghiệp",
+          "Khi điều kiện sinh ra nó không còn",
+          "Khi con người có tri thức khoa học đầy đủ",
+          "Khi bị cấm đoán bằng biện pháp hành chính",
+        ],
+        correct: 1,
+      },
+      {
+        q: "Câu nói 'Tôn giáo là tiếng thở dài của sinh vật bị áp bức...' là của ai?",
+        a: [
+          "Ph. Ăngghen",
+          "V.I. Lênin",
+          "C. Mác",
+          "Hồ Chí Minh",
+        ],
+        correct: 2,
+      },
+      {
+        q: "Trong công tác tôn giáo, Nhà nước Việt Nam luôn kết hợp phương pháp nào?",
+        a: [
+          "Hành chính – ép buộc",
+          "Tuyên truyền vận động quần chúng",
+          "Quản lý kinh tế",
+          "Chính trị, pháp luật và tuyên truyền vận động quần chúng",
+        ],
+        correct: 3,
+      },
+      {
+        q: "Câu nói 'Tôn giáo là một bộ phận của nền văn hóa tinh thần dân tộc' thể hiện điều gì?",
+        a: [
+          "Nhận thức biện chứng và thực tiễn về tôn giáo",
+          "Quan điểm duy tâm về tôn giáo",
+          "Sự đề cao tôn giáo hơn chính trị",
+          "Tách rời tôn giáo khỏi văn hóa dân tộc",
+        ],
+        correct: 0,
+      },
+      {
+        q: "Chính sách tôn giáo của Việt Nam được xác định dựa trên nền tảng nào?",
+        a: [
+          "Phân biệt giữa người có đạo và không đạo",
+          "Chủ nghĩa vô thần cực đoan",
+          "Đấu tranh loại bỏ tôn giáo",
+          "Đại đoàn kết toàn dân",
+        ],
+        correct: 3,
+      },
+      {
+        q: "Từ thực tiễn công tác tôn giáo, bài học quan trọng cho sinh viên ngành khoa học xã hội là gì?",
+        a: [
+          "Luôn cảnh giác và tránh xa các tôn giáo",
+          "Chỉ quan tâm đến lý thuyết vô thần",
+          "Nhìn nhận tôn giáo bằng thái độ khoa học, khách quan, tôn trọng khác biệt",
+          "Tập trung tuyên truyền bài xích tôn giáo",
+        ],
+        correct: 2,
+      },
+      {
+        q: "Một tu sĩ tham gia hoạt động xã hội, từ thiện, bảo vệ môi trường thể hiện điều gì?",
+        a: [
+          "Vi phạm vai trò tôn giáo",
+          "Sự hòa hợp giữa đạo và đời",
+          "Can thiệp vào chính trị",
+          "Mất đi bản chất tôn giáo",
+        ],
+        correct: 1,
+      },
+      {
+        q: "Trong công tác tôn giáo, yếu tố quan trọng hàng đầu là gì?",
+        a: [
+          "Độc lập dân tộc",
+          "Sự hiểu biết, tôn trọng và đối thoại",
+          "Quản lý bằng biện pháp cứng rắn",
+          "Liên kết các tổ chức tôn giáo",
+        ],
+        correct: 1,
+      },
+      {
+        q: "Nội dung nào sau đây không thuộc định hướng giải quyết vấn đề tôn giáo ở Việt Nam hiện nay?",
+        a: [
+          "Kết hợp chính trị, pháp luật và vận động quần chúng",
+          "Giữ vững chủ quyền, tăng cường an ninh tôn giáo",
+          "Phát huy giá trị đạo đức, nhân văn của tôn giáo",
+          "Cấm toàn bộ hoạt động truyền đạo trong cộng đồng",
+        ],
+        correct: 3,
+      },
+      {
+        q: "Hiện tượng lợi dụng tôn giáo để chia rẽ dân tộc thường xuất phát từ đâu?",
+        a: [
+          "Các mâu thuẫn nội bộ tôn giáo",
+          "Tín đồ thiếu lòng tin",
+          "Chính sách Nhà nước không phù hợp",
+          "Âm mưu của các thế lực thù địch",
+        ],
+        correct: 3,
+      },
+      {
+        q: "Khi công tác tôn giáo được thực hiện tốt, tác động tích cực nào sẽ xuất hiện?",
+        a: [
+          "Làm giảm niềm tin vào chủ nghĩa xã hội",
+          "Tăng cường đoàn kết, ổn định xã hội",
+          "Giảm uy tín của Nhà nước",
+          "Gây xung đột giữa các tôn giáo",
+        ],
+        correct: 1,
+      },
+      {
+        q: "Luật Tín ngưỡng, Tôn giáo của Việt Nam được ban hành năm nào?",
+        a: ["2013", "2015", "2016", "2018"],
+        correct: 2,
+      },
+      {
+        q: "Ở Việt Nam, quyền tự do tín ngưỡng, tôn giáo được quy định trong Hiến pháp nào?",
+        a: [
+          "Hiến pháp 1946",
+          "Hiến pháp 1992",
+          "Hiến pháp 2013",
+          "Hiến pháp 1980",
+        ],
+        correct: 2,
+      },
+      {
+        q: "Tôn giáo nào gắn bó sớm nhất với lịch sử dân tộc Việt Nam?",
+        a: [
+          "Phật giáo",
+          "Thiên Chúa giáo",
+          "Hồi giáo",
+          "Tin Lành",
+        ],
+        correct: 0,
+      },
+      {
+        q: "Một quốc gia xã hội chủ nghĩa lý tưởng sẽ có đặc điểm gì về tôn giáo?",
+        a: [
+          "Không còn tôn giáo tồn tại",
+          "Chỉ còn một tôn giáo thống nhất",
+          "Nhà nước tài trợ cho các tổ chức tôn giáo",
+          "Tôn giáo vẫn tồn tại nhưng không còn bị lợi dụng",
+        ],
+        correct: 3,
+      },
+      {
+        q: "Phương châm 'Tốt đời, đẹp đạo' thể hiện điều gì trong chính sách tôn giáo Việt Nam?",
+        a: [
+          "Sự hòa hợp giữa giá trị đạo đức tôn giáo và đời sống xã hội",
+          "Sự ưu tiên tôn giáo hơn nhà nước",
+          "Quan điểm tách biệt hoàn toàn giữa đạo và đời",
+          "Chính sách tuyên truyền tôn giáo",
+        ],
+        correct: 0,
+      },
+      {
+        q: "Vai trò của các chức sắc, tín đồ tôn giáo trong xã hội hiện nay là gì?",
+        a: [
+          "Tách biệt khỏi đời sống xã hội",
+          "Cầu nguyện, hành lễ là nhiệm vụ chính",
+          "Đại diện cho các tổ chức quốc tế",
+          "Cầu nối giữa đạo và đời, góp phần xây dựng xã hội tốt đẹp",
+        ],
+        correct: 3,
+      },
+      {
+        q: "Nguồn gốc của tôn giáo không bao gồm yếu tố nào dưới đây?",
+        a: [
+          "Tự nhiên",
+          "Kinh tế – xã hội",
+          "Chính trị đối ngoại",
+          "Nhận thức và tâm lý",
+        ],
+        correct: 2,
+      },
+      {
+        q: "Tổ chức nào đại diện cho Phật giáo thống nhất ở Việt Nam?",
+        a: [
+          "Giáo hội Phật giáo Việt Nam",
+          "Hội Liên hiệp Phật giáo Toàn quốc",
+          "Hội Phật giáo Thống nhất Việt Nam",
+          "Mặt trận Tổ quốc Việt Nam",
+        ],
+        correct: 0,
+      },
+      {
+        q: "Theo quan điểm của Đảng, công tác tôn giáo là trách nhiệm của ai?",
+        a: [
+          "Ban Tôn giáo Chính phủ",
+          "Toàn bộ hệ thống chính trị",
+          "Chính phủ Trung ương",
+          "Các tổ chức tôn giáo",
+        ],
+        correct: 1,
+      },
+      {
+        q: "Đặc điểm nổi bật của tôn giáo ở Việt Nam là gì?",
+        a: [
+          "Chỉ có một tôn giáo chi phối đời sống xã hội",
+          "Các tôn giáo thường đối lập nhau gay gắt",
+          "Đa tôn giáo, hòa hợp và không có xung đột tôn giáo",
+          "Tôn giáo bị hạn chế hoạt động",
+        ],
+        correct: 2,
+      },
+      {
+        q: "Trong thời kỳ quá độ lên CNXH, quan hệ giữa dân tộc và tôn giáo ở Việt Nam được thể hiện như thế nào?",
+        a: [
+          "Xung đột gay gắt giữa các tôn giáo",
+          "Thống nhất trong mục tiêu xây dựng đất nước",
+          "Tách biệt giữa đạo và đời",
+          "Chưa được gắn kết chặt chẽ",
+        ],
+        correct: 1,
+      },
+      {
+        q: "Theo quan điểm Mác – Lênin, việc giải quyết vấn đề tôn giáo trong CNXH phải...",
+        a: [
+          "Dựa trên sự đàn áp các tổ chức tôn giáo",
+          "Tôn trọng tự do tín ngưỡng và không tín ngưỡng",
+          "Loại bỏ tôn giáo khỏi đời sống xã hội",
+          "Cấm hoạt động tôn giáo dưới mọi hình thức",
+        ],
+        correct: 1,
+      },
+      {
+        q: "Luật Tín ngưỡng, Tôn giáo 2016 quy định nguyên tắc nào sau đây?",
+        a: [
+          "Nhà nước quản lý mọi hoạt động tôn giáo bằng biện pháp hành chính",
+          "Không ai được ép buộc người khác theo hay không theo tôn giáo",
+          "Chỉ tôn giáo có nguồn gốc Việt Nam mới được công nhận",
+          "Người nước ngoài không được tham gia sinh hoạt tôn giáo",
+        ],
+        correct: 1,
+      },
+      {
+        q: "Theo thông tin từ Ban Tôn giáo Chính phủ (tính đến tháng 6/2025), Việt Nam có bao nhiêu tôn giáo được Nhà nước công nhận hoạt động hợp pháp?",
+        a: ["4", "11", "13", "16"],
+        correct: 3,
+      },
+      {
+        q: "Khi tiếp xúc với người có tín ngưỡng khác mình, thái độ đúng theo tinh thần CNXH là gì?",
+        a: [
+          "Tranh luận để thuyết phục họ bỏ đạo",
+          "Tôn trọng, lắng nghe, đối thoại bình đẳng",
+          "Cảnh giác và né tránh",
+          "Khẳng định đạo của mình là đúng hơn",
+        ],
+        correct: 1,
+      },
+    ];
+
     const TRIVIA = {
-      christianity: [
-        {
-          q: "What is the name of the prayer Jesus taught his disciples?",
-          a: [
-            "The Lord's Prayer",
-            "The Apostles' Creed",
-            "The Nicene Creed",
-            "The Hail Mary",
-          ],
-          correct: 0,
-        },
-        {
-          q: "How many books are in the New Testament?",
-          a: ["27", "39", "66", "73"],
-          correct: 0,
-        },
-        {
-          q: "Which river is Jesus traditionally said to have been baptized in?",
-          a: [
-            "Jordan River",
-            "Nile River",
-            "Euphrates River",
-            "Galilee River",
-          ],
-          correct: 0,
-        },
-        {
-          q: "What is the season of Advent used to prepare for?",
-          a: ["Christmas", "Easter", "Pentecost", "Lent"],
-          correct: 0,
-        },
-        {
-          q: "The ichthys (fish) symbol was used by early Christians for what?",
-          a: [
-            "Secret identification",
-            "Fishing profession",
-            "Baptism symbol",
-            "Funeral rite",
-          ],
-          correct: 0,
-        },
-        {
-          q: "What is the Eucharist also commonly called?",
-          a: ["Holy Communion", "Confession", "Confirmation", "Baptism"],
-          correct: 0,
-        },
-        {
-          q: "On which hill was Jesus crucified?",
-          a: ["Golgotha", "Mount Zion", "Mount Sinai", "Mount Carmel"],
-          correct: 0,
-        },
-      ],
-      buddhism: [
-        {
-          q: "What does 'Buddha' mean in Sanskrit?",
-          a: ["Awakened One", "Holy Man", "Peaceful One", "Wise Teacher"],
-          correct: 0,
-        },
-        {
-          q: "In which city did Siddhartha Gautama reach enlightenment?",
-          a: ["Bodh Gaya", "Varanasi", "Sarnath", "Lumbini"],
-          correct: 0,
-        },
-        {
-          q: "What are the 'Three Jewels' of Buddhism?",
-          a: [
-            "Buddha, Dharma, Sangha",
-            "Peace, Love, Wisdom",
-            "Birth, Life, Death",
-            "Body, Mind, Spirit",
-          ],
-          correct: 0,
-        },
-        {
-          q: "What is the Buddhist term for the cycle of rebirth?",
-          a: ["Samsara", "Nirvana", "Karma", "Dharma"],
-          correct: 0,
-        },
-        {
-          q: "How many spokes does the Dharma Wheel traditionally have?",
-          a: ["8", "4", "12", "16"],
-          correct: 0,
-        },
-        {
-          q: "What is the name of the first sermon Buddha gave after enlightenment?",
-          a: [
-            "Setting the Wheel of Dharma in Motion",
-            "The Heart Sutra",
-            "The Diamond Sutra",
-            "The Lotus Sutra",
-          ],
-          correct: 0,
-        },
-        {
-          q: "The Eightfold Path is central to which Buddhist tradition?",
-          a: [
-            "Early Buddhism (Theravada)",
-            "Zen Buddhism",
-            "Tibetan Buddhism",
-            "Pure Land Buddhism",
-          ],
-          correct: 0,
-        },
-      ],
-      islam: [
-        {
-          q: "What is the holy book of Islam?",
-          a: ["Quran", "Torah", "Bible", "Vedas"],
-          correct: 0,
-        },
-        {
-          q: "How many times a day are Muslims called to pray (salah)?",
-          a: ["5", "3", "7", "10"],
-          correct: 0,
-        },
-        {
-          q: "What is the name of the annual pilgrimage to Mecca?",
-          a: ["Hajj", "Umrah", "Ramadan", "Eid"],
-          correct: 0,
-        },
-        {
-          q: "In which month of the Islamic calendar is Ramadan observed?",
-          a: ["9th month", "1st month", "12th month", "5th month"],
-          correct: 0,
-        },
-        {
-          q: "What is the declaration of faith in Islam called?",
-          a: ["Shahada", "Salat", "Zakat", "Sawm"],
-          correct: 0,
-        },
-        {
-          q: "The Hijra refers to the Prophet Muhammad's migration to which city?",
-          a: ["Medina", "Mecca", "Taif", "Jerusalem"],
-          correct: 0,
-        },
-        {
-          q: "What geometric art style is central to Islamic architecture?",
-          a: [
-            "Arabesque patterns",
-            "Circles only",
-            "Triangles only",
-            "Straight lines only",
-          ],
-          correct: 0,
-        },
-      ],
-      hinduism: [
-        {
-          q: "What sacred syllable is considered the essence of the universe?",
-          a: ["Om (Aum)", "Shanti", "Namaste", "Dharma"],
-          correct: 0,
-        },
-        {
-          q: "Dharma in Hinduism refers to what?",
-          a: [
-            "Righteous duty / cosmic order",
-            "The cycle of reincarnation",
-            "Divine love",
-            "Sacred fire",
-          ],
-          correct: 0,
-        },
-        {
-          q: "Which river is considered most sacred in Hinduism?",
-          a: ["Ganges (Ganga)", "Yamuna", "Saraswati", "Brahmaputra"],
-          correct: 0,
-        },
-        {
-          q: "Diwali celebrates the triumph of what over what?",
-          a: [
-            "Light over darkness",
-            "Good over evil",
-            "Knowledge over ignorance",
-            "All of the above",
-          ],
-          correct: 3,
-        },
-        {
-          q: "How many main chakras are recognized in yogic tradition?",
-          a: ["7", "5", "9", "12"],
-          correct: 0,
-        },
-        {
-          q: "The Bhagavad Gita is a dialogue between Krishna and which warrior?",
-          a: ["Arjuna", "Karna", "Bhima", "Yudhishthira"],
-          correct: 0,
-        },
-        {
-          q: "What is the Hindu term for non-violence?",
-          a: ["Ahimsa", "Satya", "Tapas", "Brahmacharya"],
-          correct: 0,
-        },
-      ],
-      shinto: [
-        {
-          q: "What are the spirits or gods worshipped in Shinto called?",
-          a: ["Kami", "Buddha", "Tengu", "Oni"],
-          correct: 0,
-        },
-        {
-          q: "What is the sacred gateway marking the entrance to a Shinto shrine?",
-          a: ["Torii", "Shimenawa", "Haiden", "Ofuda"],
-          correct: 0,
-        },
-        {
-          q: "Amaterasu is the Shinto goddess of what?",
-          a: ["The Sun", "The Moon", "The Sea", "The Wind"],
-          correct: 0,
-        },
-        {
-          q: "What is the name of the purification ritual central to Shinto?",
-          a: ["Misogi (Harae)", "Matsuri", "Omamori", "Kagura"],
-          correct: 0,
-        },
-        {
-          q: "What is the sacred Shinto text recording mythology and history?",
-          a: ["Kojiki", "Nihon Shoki", "Manyoshu", "Genji Monogatari"],
-          correct: 0,
-        },
-        {
-          q: "Ofuda are paper charms that serve what purpose in Shinto?",
-          a: [
-            "Protection and blessing",
-            "Fortune telling",
-            "Ancestor worship",
-            "Marriage ceremony",
-          ],
-          correct: 0,
-        },
-        {
-          q: "What festival celebrates the new year in Shinto?",
-          a: ["Hatsumode", "Obon", "Tanabata", "Setsubun"],
-          correct: 0,
-        },
-      ],
+      christianity: commonTriviaBank,
+      buddhism: commonTriviaBank,
+      islam: commonTriviaBank,
+      hinduism: commonTriviaBank,
+      shinto: commonTriviaBank,
     };
 
     const ENEMY_TYPES = [
